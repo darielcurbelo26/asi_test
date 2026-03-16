@@ -383,6 +383,13 @@ body.theme-switching .nav_component .difference-text div {
     transform: translateX(0);
 }
 
+.nav_menu .nav_list a,
+.nav_menu .nav_list a .text-inner,
+.nav_menu .nav_list a .text-outer {
+    opacity: 1;
+    visibility: visible;
+}
+
 .nav_menu.active .nav_list a,
 .nav_menu.active .nav_list a .text-inner,
 .nav_menu.active .nav_list a .text-outer {

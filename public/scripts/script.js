@@ -325,55 +325,68 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 1. BURGER MENU ---
-    const burger = document.getElementById('nav_button-menu');
-    const rightNavbar = document.querySelector('.nav_menu');
-    if (burger && rightNavbar) {
-        const menuLinks = rightNavbar.querySelectorAll('.nav_list a, .nav_list a .text-inner, .nav_list a .text-outer');
+    function getMenuElements() {
+        return {
+            burger: document.getElementById('nav_button-menu'),
+            rightNavbar: document.querySelector('.nav_menu')
+        };
+    }
 
-        function forceMenuLinksVisible(enable) {
-            menuLinks.forEach((el) => {
-                if (enable) {
-                    el.style.opacity = '1';
-                    el.style.visibility = 'visible';
-                } else {
-                    el.style.opacity = '';
-                    el.style.visibility = '';
-                }
-            });
-        }
-
-        function openMenu() {
-            burger.classList.add('active');
-            rightNavbar.classList.add('active');
-            document.body.classList.add('menu-open');    // CSS lock
-            document.body.style.overflow = 'hidden';     // JS lock
-            forceMenuLinksVisible(true);
-        }
-        function closeMenu() {
-            burger.classList.remove('active');
-            rightNavbar.classList.remove('active');
-            document.body.classList.remove('menu-open'); // CSS unlock
-            document.body.style.overflow = '';            // JS unlock
-            forceMenuLinksVisible(false);
-        }
-
-        burger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            rightNavbar.classList.contains('active') ? closeMenu() : openMenu();
-        });
-
-        // Close on click outside
-        document.addEventListener('mousedown', (e) => {
-            if (rightNavbar.classList.contains('active')) {
-                if (!rightNavbar.contains(e.target) && !burger.contains(e.target)) closeMenu();
+    function forceMenuLinksVisible(enable) {
+        const { rightNavbar } = getMenuElements();
+        if (!rightNavbar) return;
+        rightNavbar.querySelectorAll('.nav_list a, .nav_list a .text-inner, .nav_list a .text-outer').forEach((el) => {
+            if (enable) {
+                el.style.opacity = '1';
+                el.style.visibility = 'visible';
+            } else {
+                el.style.opacity = '';
+                el.style.visibility = '';
             }
         });
-
-        // Close on nav link click (so scroll restores after navigation)
-        rightNavbar.querySelectorAll('a').forEach(a => {
-            a.addEventListener('click', () => closeMenu());
-        });
     }
+
+    function setMenuOpenState(shouldOpen) {
+        const { burger, rightNavbar } = getMenuElements();
+        if (!burger || !rightNavbar) return;
+
+        burger.classList.toggle('active', shouldOpen);
+        rightNavbar.classList.toggle('active', shouldOpen);
+        document.body.classList.toggle('menu-open', shouldOpen);
+        document.body.style.overflow = shouldOpen ? 'hidden' : '';
+        forceMenuLinksVisible(shouldOpen);
+    }
+
+    // Works even if nav component is re-rendered/injected after this script initializes.
+    document.addEventListener('click', (e) => {
+        const burgerBtn = e.target && e.target.closest ? e.target.closest('#nav_button-menu') : null;
+        if (burgerBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const { rightNavbar } = getMenuElements();
+            setMenuOpenState(!(rightNavbar && rightNavbar.classList.contains('active')));
+            return;
+        }
+
+        const menuLink = e.target && e.target.closest ? e.target.closest('.nav_menu a') : null;
+        if (menuLink) {
+            setMenuOpenState(false);
+        }
+    }, true);
+
+    document.addEventListener('mousedown', (e) => {
+        const { burger, rightNavbar } = getMenuElements();
+        if (!burger || !rightNavbar || !rightNavbar.classList.contains('active')) return;
+        if (!rightNavbar.contains(e.target) && !burger.contains(e.target)) {
+            setMenuOpenState(false);
+        }
+    });
+
+    // Safety re-apply in case cached styles or delayed component insertion desync state.
+    setTimeout(() => {
+        const { rightNavbar } = getMenuElements();
+        forceMenuLinksVisible(Boolean(rightNavbar && rightNavbar.classList.contains('active')));
+    }, 300);
 
     // --- 2. THEME TOGGLE (integrated with DesignSystem) ---
     const themeToggle = document.querySelector('.icon-button.is-square');

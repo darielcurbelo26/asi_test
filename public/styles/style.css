@@ -1419,25 +1419,23 @@ body.dark-mode .not-found-ui-layer {
 
 /* A Sweet Kid title: hide text, show wordmark image in its place. */
 .a-sweet-kid-page .heading-style-h1-image {
-    /* CSS grid stacks children into the same cell */
-    display: grid;
+    position: relative;
     width: min(100%, 980px);
     /* cancel the global heading blur + scale so the image is crisp */
     transform: none;
     filter: none;
-}
-
-.a-sweet-kid-page .heading-style-h1-image .h1-image-placeholder,
-.a-sweet-kid-page .heading-style-h1-image img {
-    grid-area: 1 / 1;
+    /* pull content below 5% closer */
+    margin-bottom: -5%;
 }
 
 .a-sweet-kid-page .heading-style-h1-image .h1-image-placeholder {
-    visibility: hidden;   /* preserves height, hides text */
+    visibility: hidden;   /* preserves height for layout, hides text */
     pointer-events: none;
 }
 
 .a-sweet-kid-page .heading-style-h1-image img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: contain;

@@ -207,18 +207,6 @@ body.theme-switching .nav_component .difference-text div {
     mix-blend-mode: normal !important;
 }
 
-/* Defensive override: when side menu is open on project pages, links must stay visible. */
-.project-page-template .nav_menu.active .nav_list a,
-.project-page-template .nav_menu.active .nav_list a .text-inner,
-.project-page-template .nav_menu.active .nav_list a .text-outer,
-.project-page-a-sweet-kid .nav_menu.active .nav_list a,
-.project-page-a-sweet-kid .nav_menu.active .nav_list a .text-inner,
-.project-page-a-sweet-kid .nav_menu.active .nav_list a .text-outer {
-    opacity: 1 !important;
-    visibility: visible !important;
-    color: var(--text-color) !important;
-}
-
 /* Burger negro en escritorio cuando el menú está abierto (Solo Projects Page) */
 @media screen and (min-width: 769px) {
     .projects-page .nav_button.active div {
@@ -1468,9 +1456,11 @@ body.dark-mode .not-found-ui-layer {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 100%;
-    height: 100%;
+    width: 73%;
+    height: auto;
+    max-height: 73%;
     transform: translate(-50%, -50%);
+    filter: none;
     object-fit: contain;
     object-position: center;
     pointer-events: none;

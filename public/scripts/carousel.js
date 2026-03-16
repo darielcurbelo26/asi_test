@@ -8,6 +8,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Generate image paths in random order with a minimum gap of 10 between adjacent indices
     const TOTAL_IMAGES = 406;
     const MIN_GAP = 10;
+    const imageRatioCache = new Map();
+    const imageRatioPromises = new Map();
+
+    function loadImageRatio(src) {
+        if (imageRatioCache.has(src)) return Promise.resolve(imageRatioCache.get(src));
+        if (imageRatioPromises.has(src)) return imageRatioPromises.get(src);
+
+        const promise = new Promise((resolve) => {
+            const img = new Image();
+            img.decoding = 'async';
+            img.onload = () => {
+                const ratio = img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1;
+                imageRatioCache.set(src, ratio || 1);
+                imageRatioPromises.delete(src);
+                resolve(ratio || 1);
+            };
+            img.onerror = () => {
+                imageRatioPromises.delete(src);
+                resolve(null);
+            };
+            img.src = src;
+        });
+
+        imageRatioPromises.set(src, promise);
+        return promise;
+    }
 
     function buildShuffledImages() {
         // Fisher-Yates shuffle
@@ -194,6 +220,16 @@ document.addEventListener('DOMContentLoaded', () => {
         let headLogicalIndex = Math.floor(Math.random() * images.length);
         let tailLogicalIndex = headLogicalIndex + slideCount - 1;
 
+        function applySlideWidth(slideEl, src) {
+            const ratio = imageRatioCache.get(src);
+            if (!ratio) return;
+
+            const slideHeight = slideEl.offsetHeight || cardHeight;
+            const width = Math.max(1, Math.round(slideHeight * ratio));
+            slideEl.style.width = `${width}px`;
+            slideEl.dataset.span = String(width + gap);
+        }
+
         function setSlideToLogicalIndex(slideEl, logicalIndex) {
             const idx = mod(logicalIndex, images.length);
             const card = slideEl.firstElementChild;
@@ -201,7 +237,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const img = slideEl.querySelector('img');
             if (img) {
                 const nextSrc = images[idx];
+                img.dataset.src = nextSrc;
+                applySlideWidth(slideEl, nextSrc);
                 if (img.getAttribute('src') !== nextSrc) img.src = nextSrc;
+                loadImageRatio(nextSrc).then(() => {
+                    if (img.dataset.src === nextSrc) applySlideWidth(slideEl, nextSrc);
+                });
             }
         }
 
@@ -215,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const img = document.createElement('img');
             img.className = 'carousel-image';
             img.draggable = false;
-            img.loading = 'lazy';
+            img.loading = 'eager';
             img.decoding = 'async';
 
             card.appendChild(img);
@@ -230,6 +271,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         track.replaceChildren(frag);
 
+        for (let i = 0; i < slideCount; i++) {
+            loadImageRatio(images[mod(headLogicalIndex + i, images.length)]);
+        }
+
         let currentX = 0;
         let velocity = 0;
         let isSwiping = false;
@@ -237,6 +282,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const getSlideSpan = (slideEl) => {
             if (!slideEl) return estimatedSpan;
+            const cachedSpan = parseFloat(slideEl.dataset.span || '');
+            if (Number.isFinite(cachedSpan) && cachedSpan > 0) return cachedSpan;
             const w = slideEl.offsetWidth;
             return (w || (estimatedSpan - gap)) + gap;
         };
@@ -257,6 +304,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 track.appendChild(addFrag);
             }
+
+            Array.from(track.children).forEach((slideEl) => {
+                const img = slideEl.querySelector('img');
+                if (img && img.dataset.src) applySlideWidth(slideEl, img.dataset.src);
+            });
         }
         setTimeout(setup, 0);
 

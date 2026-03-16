@@ -8,17 +8,21 @@
     <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; connect-src 'self'; frame-src 'self';">
     <title data-cms-project="meta_title">Project — TATC</title>
-    <link rel="stylesheet" href="styles/style.css?v=20260316a">
+    <link rel="stylesheet" href="styles/style.css">
     <script src="scripts/cms-engine.js" defer></script>
     <script src="scripts/design-system.js"></script>
     <style>
         .project-hero-kicker {
-            display: flex;
+            display: none;
             flex-wrap: wrap;
-            gap: .5rem 2rem;
+            gap: .35rem 1.5rem;
             align-items: baseline;
-            margin-bottom: .5rem;
-            margin-top: 1.5rem;
+            margin-bottom: .1rem;
+            margin-top: .35rem;
+        }
+
+        #proj-h1 {
+            filter: none !important;
         }
 
         .project-kicker-label {
@@ -41,7 +45,7 @@
             .project-hero-kicker {
                 justify-content: center;
                 text-align: center;
-                gap: .45rem 1rem;
+                gap: .3rem .8rem;
             }
 
             .project-kicker-label,
@@ -51,18 +55,18 @@
         }
 
         .project-body-text {
-            max-width: 760px;
-            margin: 0 auto;
+            max-width: 432px;
+            margin: .45rem auto 1.25rem;
         }
 
         .project-body-text p+p {
-            margin-top: 1.5rem;
+            margin-top: 1rem;
         }
 
         .project-cta-wrapper {
             display: flex;
             justify-content: center;
-            padding: 3rem 0 1rem;
+            padding: 2rem 0 .75rem;
         }
 
         .project-cta-btn {
@@ -86,7 +90,73 @@
         }
 
         .section-spacer {
-            height: 4rem;
+            height: 2rem;
+        }
+
+        #proj-h2-wrap {
+            filter: none;
+            margin-top: -.35rem;
+            padding: .2em .75em .35em .75em;
+        }
+
+        #proj-h2 {
+            font-weight: 600;
+            letter-spacing: -0.06em;
+            font-size: clamp(14px, 2.1vw, 20px);
+        }
+
+        .a-sweet-kid-page .layout_stack {
+            gap: .12em;
+        }
+
+        .a-sweet-kid-page .section_hero.layout_stack {
+            transform: translateY(-3.5%);
+        }
+
+        .a-sweet-kid-page #proj-body {
+            text-align: center;
+            text-align-last: center;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            font-size: clamp(11px, 1.35vw, 14px);
+        }
+
+        @media (max-width: 768px) {
+            .a-sweet-kid-page .section_hero.layout_stack {
+                transform: translateY(-0.5%);
+                gap: .12em;
+                padding-top: .4rem;
+            }
+
+            .a-sweet-kid-page #proj-h2-wrap {
+                margin-top: .65rem;
+                padding-bottom: .2em;
+            }
+
+            .a-sweet-kid-page #proj-h2 {
+                font-size: clamp(14px, 4.6vw, 20px);
+                line-height: .95;
+            }
+
+            .a-sweet-kid-page .heading-style-h1-image img {
+                width: 79%;
+                max-height: 79%;
+            }
+
+            .a-sweet-kid-page .project-body-text {
+                max-width: min(90vw, 624px);
+                margin: .65rem auto .85rem;
+            }
+
+            .a-sweet-kid-page #proj-body {
+                font-size: clamp(11px, 3.6vw, 14px);
+                line-height: 1.16;
+                font-weight: 300;
+            }
+
+            .a-sweet-kid-page .section-spacer {
+                height: .8rem;
+            }
         }
     </style>
 </head>
@@ -188,7 +258,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="scripts/script.js?v=20260316a"></script>
+    <script src="scripts/script.js"></script>
     <script src="scripts/carousel.js"></script>
 
     <script>

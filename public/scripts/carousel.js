@@ -179,122 +179,134 @@ document.addEventListener('DOMContentLoaded', () => {
         // Shuffle propio por fila — orden y punto de inicio distintos
         const images = buildShuffledImages();
 
-        // Virtualización: renderiza solo las tarjetas necesarias para cubrir el viewport
-        // y recicla los nodos para crear el efecto infinito (mucho menos DOM/requests).
         const gap = parseFloat(window.getComputedStyle(track).gap) || 0;
         const cardHeight = parseFloat(
             window.getComputedStyle(document.documentElement).getPropertyValue('--card-height')
         ) || 160;
         const estimatedSpan = Math.max(120, cardHeight * 1.4) + gap;
-        const slideCount = Math.min(
-            140,
-            Math.max(24, Math.ceil((row.clientWidth || window.innerWidth) / estimatedSpan) + 14)
-        );
 
-        let headLogicalIndex = Math.floor(Math.random() * images.length);
-        let tailLogicalIndex = headLogicalIndex + slideCount - 1;
-
-        function setSlideToLogicalIndex(slideEl, logicalIndex) {
-            const idx = mod(logicalIndex, images.length);
-            const card = slideEl.firstElementChild;
-            if (card) card.dataset.idx = String(idx);
-            const img = slideEl.querySelector('img');
-            if (img) {
-                const nextSrc = images[idx];
-                if (img.getAttribute('src') !== nextSrc) img.src = nextSrc;
-            }
+        function fitSlideWidth(slideEl, imgEl) {
+            if (!slideEl || !imgEl) return;
+            if (!imgEl.naturalWidth || !imgEl.naturalHeight) return;
+            const fittedWidth = Math.max(60, Math.round((imgEl.naturalWidth / imgEl.naturalHeight) * cardHeight));
+            slideEl.style.width = `${fittedWidth}px`;
         }
 
-        function createSlide(logicalIndex) {
+        function createSlide(imageIdx) {
             const slide = document.createElement('div');
             slide.className = 'carousel-slide';
+            // Start with a compact fallback width, then fit to real image aspect ratio.
+            slide.style.width = `${Math.max(90, cardHeight)}px`;
 
             const card = document.createElement('div');
             card.className = 'carousel-card';
+            card.dataset.idx = String(imageIdx);
+            card.style.width = '100%';
 
             const img = document.createElement('img');
             img.className = 'carousel-image';
             img.draggable = false;
             img.loading = 'lazy';
             img.decoding = 'async';
+            img.src = images[imageIdx];
+            img.alt = `Image ${imageIdx + 1}`;
+
+            img.addEventListener('load', () => {
+                fitSlideWidth(slide, img);
+            }, { passive: true });
+
+            if (img.complete) {
+                fitSlideWidth(slide, img);
+            }
 
             card.appendChild(img);
             slide.appendChild(card);
-            setSlideToLogicalIndex(slide, logicalIndex);
             return slide;
         }
-
-        const frag = document.createDocumentFragment();
-        for (let i = 0; i < slideCount; i++) {
-            frag.appendChild(createSlide(headLogicalIndex + i));
-        }
-        track.replaceChildren(frag);
 
         let currentX = 0;
         let velocity = 0;
         let isSwiping = false;
         let startX = 0, lastX = 0, lastTime = 0;
+        let sequenceWidth = 0;
+        let baseSlideCount = 0;
 
         const getSlideSpan = (slideEl) => {
             if (!slideEl) return estimatedSpan;
-            const w = slideEl.offsetWidth;
+            const w = slideEl.getBoundingClientRect().width || slideEl.offsetWidth;
             return (w || (estimatedSpan - gap)) + gap;
         };
 
-        function setup() {
-            // Mantiene el carrusel “llenando” el ancho en resizes.
-            // Si la pantalla crece, añade algunos slides extra.
-            const desired = Math.min(
-                180,
-                Math.max(24, Math.ceil((row.clientWidth || window.innerWidth) / estimatedSpan) + 14)
-            );
-            const current = track.children.length;
-            if (current < desired) {
-                const addFrag = document.createDocumentFragment();
-                for (let i = 0; i < desired - current; i++) {
-                    tailLogicalIndex += 1;
-                    addFrag.appendChild(createSlide(tailLogicalIndex));
-                }
-                track.appendChild(addFrag);
+        function measureSequenceWidth() {
+            if (baseSlideCount <= 0) return;
+            const slides = track.children;
+            let width = 0;
+            for (let i = 0; i < baseSlideCount && i < slides.length; i++) {
+                width += getSlideSpan(slides[i]);
+            }
+            if (width > 0) sequenceWidth = width;
+        }
+
+        function wrapPosition() {
+            if (!sequenceWidth) return;
+            while (currentX <= -2 * sequenceWidth) currentX += sequenceWidth;
+            while (currentX > -sequenceWidth) currentX -= sequenceWidth;
+        }
+
+        function buildTrack() {
+            const desiredSpan = Math.max((row.clientWidth || window.innerWidth) * 1.5, window.innerWidth + 320);
+            const startIdx = Math.floor(Math.random() * images.length);
+            const baseSlides = [];
+            const baseFrag = document.createDocumentFragment();
+
+            let accSpan = 0;
+            let i = 0;
+            while (accSpan < desiredSpan && i < images.length * 2) {
+                const imgIdx = mod(startIdx + i, images.length);
+                const slide = createSlide(imgIdx);
+                baseSlides.push(slide);
+                baseFrag.appendChild(slide);
+                accSpan += estimatedSpan;
+                i += 1;
             }
 
-        }
-        setTimeout(setup, 0);
+            baseSlideCount = baseSlides.length;
+            track.replaceChildren(baseFrag);
 
-        // Recycle helper: keeps currentX within [-span(first), 0]
-        function recycle() {
-            let guard = 0;
-
-            // Move first -> end when drifting left too far
-            if (currentX <= -getSlideSpan(track.firstElementChild)) {
-                while (track.firstElementChild && currentX <= -getSlideSpan(track.firstElementChild)) {
-                    const first = track.firstElementChild;
-                    const span = getSlideSpan(first);
-                    currentX += span;
-                    headLogicalIndex += 1;
-                    tailLogicalIndex += 1;
-                    track.appendChild(first);
-                    setSlideToLogicalIndex(first, tailLogicalIndex);
-
-                    guard += 1;
-                    if (guard > 80) break;
-                }
-            } else if (currentX >= 0) {
-                // Move last -> front when drifting right (positive x)
-                while (track.lastElementChild && currentX >= 0) {
-                    const last = track.lastElementChild;
-                    const span = getSlideSpan(last);
-                    currentX -= span;
-                    headLogicalIndex -= 1;
-                    tailLogicalIndex -= 1;
-                    track.insertBefore(last, track.firstElementChild);
-                    setSlideToLogicalIndex(last, headLogicalIndex);
-
-                    guard += 1;
-                    if (guard > 80) break;
+            const cloneFrag = document.createDocumentFragment();
+            for (let copy = 0; copy < 2; copy++) {
+                for (let j = 0; j < baseSlides.length; j++) {
+                    cloneFrag.appendChild(baseSlides[j].cloneNode(true));
                 }
             }
+            track.appendChild(cloneFrag);
+
+            measureSequenceWidth();
+            if (!sequenceWidth) sequenceWidth = estimatedSpan * Math.max(1, baseSlideCount);
+            currentX = -sequenceWidth;
+            gsap.set(track, { x: currentX });
+
+            track.querySelectorAll('img').forEach((img) => {
+                const slide = img.closest('.carousel-slide');
+
+                // Ensure cloned slides also get aspect-ratio-based widths.
+                fitSlideWidth(slide, img);
+
+                img.addEventListener('load', () => {
+                    fitSlideWidth(slide, img);
+                    const previous = sequenceWidth;
+                    measureSequenceWidth();
+                    if (previous > 0 && sequenceWidth > 0) {
+                        const ratio = sequenceWidth / previous;
+                        currentX *= ratio;
+                        wrapPosition();
+                        gsap.set(track, { x: currentX });
+                    }
+                }, { passive: true });
+            });
         }
+
+        buildTrack();
 
         function animate() {
             // La dirección base del autoplay más la aceleración por gestos
@@ -302,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Fricción constante
             velocity *= 0.95;
 
-            recycle();
+            wrapPosition();
             gsap.set(track, { x: currentX });
             requestAnimationFrame(animate);
         }
@@ -371,6 +383,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        window.addEventListener('resize', () => { setTimeout(setup, 150); });
+        window.addEventListener('resize', () => {
+            setTimeout(() => {
+                buildTrack();
+            }, 150);
+        });
     });
 });

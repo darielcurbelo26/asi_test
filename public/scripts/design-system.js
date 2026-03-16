@@ -27,6 +27,11 @@ const DesignSystem = {
         }
     },
 
+    BRANDING: {
+        title: 'TATC',
+        faviconPath: 'assets/fav_icon/red-circle.svg'
+    },
+
     // ─── ESTADO ───────────────────────────────────────────────────────────────
     currentTheme: null,
     _themeSwitchTimeout: null,
@@ -156,7 +161,37 @@ const DesignSystem = {
         this.initThemeBeforeRender();
         this.syncStorageChanges();
         this.watchSystemScheme();
+        this.applyBranding();
         this.hardenLinks();
+    },
+
+    applyBranding() {
+        const apply = () => {
+            document.title = this.BRANDING.title;
+
+            const pathParts = window.location.pathname.split('/').filter(Boolean);
+            const basePath = window.location.hostname.endsWith('github.io') && pathParts.length > 0
+                ? `/${pathParts[0]}/`
+                : '/';
+            const faviconHref = `${basePath}${this.BRANDING.faviconPath}`;
+
+            let icon = document.querySelector('link[rel="icon"]');
+            if (!icon) {
+                icon = document.createElement('link');
+                icon.setAttribute('rel', 'icon');
+                document.head.appendChild(icon);
+            }
+            icon.setAttribute('type', 'image/svg+xml');
+            icon.setAttribute('href', faviconHref);
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', apply, { once: true });
+        } else {
+            apply();
+        }
+
+        document.addEventListener('cms:ready', apply);
     },
 
     hardenLinks() {

@@ -11,23 +11,26 @@
         const overlayImg = document.getElementById('overlay-img');
         const btnPrev = document.querySelector('.overlay-prev');
         const btnNext = document.querySelector('.overlay-next');
+        const isMobileLayout = window.matchMedia('(max-width: 768px), (hover: none), (pointer: coarse)').matches;
 
         if (!container || !overlay || !overlayImg || !window.gsap || !window.ScrollTrigger) return;
 
-        const itemCount = 28;
+        const itemCount = isMobileLayout ? 18 : 28;
         const images = [];
         const imagesSrcList = [];
 
         const columns = 6;
         const rows = 5;
         let cells = [];
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < columns; c++) {
-                if (r >= 2 && r <= 2 && c >= 2 && c <= 3) continue;
-                cells.push({ r, c });
+        if (!isMobileLayout) {
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < columns; c++) {
+                    if (r >= 2 && r <= 2 && c >= 2 && c <= 3) continue;
+                    cells.push({ r, c });
+                }
             }
+            cells.sort(() => Math.random() - 0.5);
         }
-        cells.sort(() => Math.random() - 0.5);
 
         let currentIdx = 0;
         const updateOverlay = () => {
@@ -57,32 +60,46 @@
         overlay.onclick = (e) => {
             if (e.target === overlay || e.target.classList.contains('overlay-content')) closeOverlay();
         };
+        window.addEventListener('keydown', (e) => {
+            if (!overlay.classList.contains('active')) return;
+            if (e.key === 'Escape') closeOverlay();
+            if (e.key === 'ArrowRight') btnNext?.click();
+            if (e.key === 'ArrowLeft') btnPrev?.click();
+        });
 
-        for (let i = 0; i < Math.min(itemCount, cells.length); i++) {
+        const totalItems = isMobileLayout ? itemCount : Math.min(itemCount, cells.length);
+
+        for (let i = 0; i < totalItems; i++) {
             const img = document.createElement('img');
             const imgNum = Math.floor(Math.random() * 400) + 1;
             const src = `assets/images/_${imgNum}.webp`;
             img.src = src;
             img.loading = 'lazy';
             img.decoding = 'async';
-            img.className = 'gallery-item';
+            img.className = isMobileLayout ? 'gallery-item gallery-item-mobile' : 'gallery-item';
             imagesSrcList.push(src);
 
-            const cell = cells[i];
-            const xBase = (cell.c / columns) * 100;
-            const yBase = (cell.r / rows) * 100;
+            if (!isMobileLayout) {
+                const cell = cells[i];
+                const xBase = (cell.c / columns) * 100;
+                const yBase = (cell.r / rows) * 100;
 
-            const xJitter = (Math.random() * 4) - 2;
-            const yJitter = (Math.random() * 4) - 2;
+                const xJitter = (Math.random() * 4) - 2;
+                const yJitter = (Math.random() * 4) - 2;
 
-            img.style.left = `${xBase + 5 + xJitter}%`;
-            img.style.top = `${yBase + 5 + yJitter}%`;
-            img.style.transform = 'scale(0.8) rotate(0deg)';
+                img.style.left = `${xBase + 5 + xJitter}%`;
+                img.style.top = `${yBase + 5 + yJitter}%`;
+                img.style.transform = 'scale(0.8) rotate(0deg)';
+            }
 
             img.addEventListener('click', () => openOverlay(i));
 
             container.appendChild(img);
             images.push(img);
+        }
+
+        if (isMobileLayout) {
+            return;
         }
 
         let scrollY = window.pageYOffset || document.documentElement.scrollTop;

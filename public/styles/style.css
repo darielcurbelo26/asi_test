@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 /* ═════════════════════════════════════════════════════════════════════════════
    DESIGN SYSTEM - SISTEMA DE DISEÑO COMPLETO
@@ -1420,6 +1420,7 @@ body.dark-mode .not-found-ui-layer {
 /* Temporary visual for A Sweet Kid title using favicon artwork. */
 .a-sweet-kid-page .heading-style-h1-image {
     position: relative;
+    width: min(100%, 980px);
 }
 
 .a-sweet-kid-page .heading-style-h1-image .h1-image-placeholder {
@@ -1433,6 +1434,12 @@ body.dark-mode .not-found-ui-layer {
     height: 100%;
     object-fit: contain;
     object-position: center;
+}
+
+@media (max-width: 768px) {
+    .a-sweet-kid-page .heading-style-h1-image {
+        width: min(100%, 92vw);
+    }
 }
 
 /* Project detail page: both artist links in A Sweet Kid CDMX description must be red. */
@@ -1812,6 +1819,63 @@ a.not-found-sub:hover {
 .enter-button:hover {
     background-color: var(--text-color);
     color: var(--bg-color);
+}
+
+/* Gate feedback: hint, lockout, recovery */
+.gate-hint {
+    margin-top: 0.75rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text-color);
+    opacity: 0.55;
+    letter-spacing: 0.04em;
+    text-align: center;
+}
+
+.gate-lockout {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+    padding: 0.8rem 1.1rem;
+    border: 1px solid rgba(212, 0, 0, 0.35);
+    background: rgba(212, 0, 0, 0.06);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: #d40000;
+    letter-spacing: 0.03em;
+    text-align: center;
+    width: min(90%, 500px);
+}
+
+.gate-lockout-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+#gate-countdown {
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.gate-recovery {
+    margin-top: 0.9rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-color);
+    opacity: 0.4;
+    text-align: center;
+}
+
+.gate-recovery-link {
+    color: var(--text-color);
+    opacity: 1;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.gate-recovery-link:hover {
+    opacity: 0.7;
 }
 
 /* Responsive Mobile Layout */

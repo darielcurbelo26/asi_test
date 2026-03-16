@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TATC — Admin</title>
+<title>TATC</title>
+<link rel="icon" type="image/svg+xml" href="../assets/fav_icon/red-circle.svg">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="admin.css">
@@ -19,40 +20,28 @@
         <span class="text-inner">TATC</span>
         <span class="text-outer">TATC</span>
       </span>
-      <span class="admin-logo-label">Control Room</span>
+      <span class="admin-logo-label">Studio</span>
     </a>
     <div class="admin-header-actions">
-      <span class="admin-chip">Studio Systems</span>
-      <button class="admin-ghost-btn" type="button" onclick="window.location.href='../index.html'">Back to site</button>
+      <span class="admin-chip" id="admin-chip">Studio</span>
+      <input id="nav-search" class="admin-search-input" type="search" placeholder="Go to…">
+      <button class="admin-ghost-btn is-primary" id="hdr-publish-btn" type="button" onclick="publishLive()">Publish ↑</button>
     </div>
   </div>
 </header>
 
-<!-- AUTH -->
-<div id="auth">
-  <div class="auth-box">
-    <div class="auth-logo">TATC Studio</div>
-    <h1>Admin</h1><p>Enter your access code</p>
-    <input class="auth-input" type="password" id="auth-pass" placeholder="••••••••" autocomplete="off">
-    <button class="auth-btn" id="auth-btn">Continue →</button>
-    <div class="auth-err" id="auth-err">Invalid code.</div>
-  </div>
-</div>
-
 <!-- ADMIN UI -->
-<div id="ui">
+<div id="ui" class="on">
   <aside class="sidebar">
     <div class="sb-head">
-      <div class="sb-brand">Studio CMS</div>
-      <div class="sb-title">TATC Admin</div>
+      <div class="sb-brand">Navigation</div>
+      <div id="sb-active-label" class="sb-title">—</div>
     </div>
     <nav class="sb-nav" id="sb-nav"></nav>
     <div class="sb-foot">
-      <div class="sb-actions">
-        <button class="btn-save" onclick="saveAll()">Save</button>
-        <button class="btn-export" onclick="exportJSON()">Export</button>
-      </div>
-      <a href="../index.html" class="btn-home">Back to Site</a>
+      <button class="btn-save" onclick="saveAll()">Save Draft <kbd>⌘S</kbd></button>
+      <button class="btn-export" onclick="exportJSON()">↓ Download JSON</button>
+      <a href="../index.html" class="btn-home">↗ View Site</a>
       <div id="sb-status"></div>
     </div>
   </aside>
@@ -63,39 +52,39 @@
 /* ══════════════════════════════════════════
    TATC ADMIN v3 — All pages, save to web
 ══════════════════════════════════════════ */
-const PASSES = ['tatc2026','TATC2026','admin','sweet'];
+if (sessionStorage.getItem('tatc-admin-unlocked') !== 'true') {
+  window.location.replace('../password.html?redirect=admin/admin.html');
+}
+
 let DATA = {}, currentPostSlug = null;
 let IS_DIRTY = false;
 let PROJECT_DETAIL_TEMPLATE = null;
+const PUBLISH_CFG_KEY = 'tatc_admin_publish_cfg';
+const PUBLISH_DEFAULTS = {
+  platform: 'github',
+  owner: 'darielcurbelo26',
+  repo: 'asi_test',
+  branch: 'main',
+  token: '',
+  autoPublish: false,
+  commitMessage: 'Update site content from admin',
+  deployHook: '',
+  lastPublished: ''
+};
 
-// ── AUTH ──
-const authEl   = document.getElementById('auth');
 const uiEl     = document.getElementById('ui');
-const authPass = document.getElementById('auth-pass');
-const authBtn  = document.getElementById('auth-btn');
-const authErr  = document.getElementById('auth-err');
+const navSearch = document.getElementById('nav-search');
 
-if (localStorage.getItem('tatc_admin') === '1') unlock();
-authBtn.onclick = tryAuth;
-authPass.onkeypress = e => e.key==='Enter' && tryAuth();
+if (sessionStorage.getItem('tatc-admin-unlocked') === 'true') initAdmin();
 
-function tryAuth() {
-  if (PASSES.includes(authPass.value.trim())) {
-    localStorage.setItem('tatc_admin','1'); unlock();
-  } else {
-    authErr.style.opacity='1'; authPass.value='';
-    setTimeout(()=>authErr.style.opacity='0',2200);
-  }
-}
-
-async function unlock() {
-  authEl.style.opacity='0'; setTimeout(()=>authEl.style.display='none',400);
+async function initAdmin() {
   uiEl.classList.add('on');
   await loadData();
   PROJECT_DETAIL_TEMPLATE = (DATA.projects_detail && DATA.projects_detail['a-sweet-kid']) ? deepClone(DATA.projects_detail['a-sweet-kid']) : null;
   syncProjectDetailsFromProjectsList();
   buildNav();
   renderPanel(NAV[0].id);
+  navSearch?.addEventListener('input', () => buildNav());
 }
 
 function deepClone(obj){
@@ -105,9 +94,9 @@ function deepClone(obj){
 function markDirty(on=true){
   IS_DIRTY = !!on;
   document.body.classList.toggle('is-dirty', IS_DIRTY);
-  const chip = document.querySelector('.admin-chip');
+  const chip = document.getElementById('admin-chip');
   if (chip) {
-    chip.textContent = IS_DIRTY ? 'Unsaved changes' : 'Studio Systems';
+    chip.textContent = IS_DIRTY ? 'Unsaved changes' : 'Studio';
     chip.classList.toggle('is-dirty', IS_DIRTY);
   }
 }
@@ -181,13 +170,44 @@ const NAV = [
 
 function buildNav() {
   const nav = document.getElementById('sb-nav');
+  const term = (navSearch?.value || '').trim().toLowerCase();
   let html = '';
   NAV.forEach(n => {
+    const haystack = `${n.label} ${n.id} ${n.cat || ''}`.toLowerCase();
+    if (term && !haystack.includes(term)) return;
     if (n.cat) html += `<div class="sb-cat">${n.cat}</div>`;
     const viewBtn = n.view ? `<a class="sb-view" href="${n.view}" target="_blank" rel="noopener noreferrer" title="View page">↗</a>` : '';
     html += `<div class="sb-item" data-id="${n.id}" onclick="renderPanel('${n.id}')"><span class="sb-item-lbl">${n.icon}&nbsp;${n.label}</span>${viewBtn}</div>`;
   });
   nav.innerHTML = html;
+}
+
+function getOverviewCards(activeId) {
+  const publishCfg = getPublishConfig();
+  return `
+    <section class="admin-overview">
+      <article class="overview-card">
+        <div class="overview-label">Current Panel</div>
+        <div class="overview-value">${NAV.find(n => n.id === activeId)?.label || activeId}</div>
+      </article>
+      <article class="overview-card">
+        <div class="overview-label">Posts</div>
+        <div class="overview-value">${DATA.blog?.posts?.length || 0}</div>
+      </article>
+      <article class="overview-card">
+        <div class="overview-label">Projects</div>
+        <div class="overview-value">${DATA.projects?.items?.length || 0}</div>
+      </article>
+      <article class="overview-card">
+        <div class="overview-label">3D Works</div>
+        <div class="overview-value">${DATA.gallery_3d?.artworks?.length || 0}</div>
+      </article>
+      <article class="overview-card is-wide">
+        <div class="overview-label">Deploy</div>
+        <div class="overview-value">${publishCfg.lastPublished ? 'Deployed' : publishCfg.platform === 'download' ? 'Download mode' : 'Ready'}</div>
+        <div class="overview-sub">${publishCfg.lastPublished ? `Last: ${publishCfg.lastPublished}` : publishCfg.platform === 'download' ? 'Download JSON → commit → push to deploy.' : 'Add a GitHub token in Global → Deploy Settings.'}</div>
+      </article>
+    </section>`;
 }
 
 // ── DATA ──
@@ -202,6 +222,152 @@ async function loadData() {
       else Object.keys(f).forEach(k=>{ if(!(k in DATA)) DATA[k]=f[k]; });
     }
   } catch(e){}
+}
+
+function getPublishConfig() {
+  try {
+    const raw = localStorage.getItem(PUBLISH_CFG_KEY);
+    return raw ? { ...PUBLISH_DEFAULTS, ...JSON.parse(raw) } : { ...PUBLISH_DEFAULTS };
+  } catch(e) {
+    return { ...PUBLISH_DEFAULTS };
+  }
+}
+
+function savePublishConfig(cfg) {
+  localStorage.setItem(PUBLISH_CFG_KEY, JSON.stringify(cfg));
+}
+
+function fillPublishConfigFields() {
+  const cfg = getPublishConfig();
+  const plat = document.getElementById('pub-platform');
+  if (plat) plat.value = cfg.platform || 'github';
+  sv('pub-owner', cfg.owner);
+  sv('pub-repo', cfg.repo);
+  sv('pub-branch', cfg.branch);
+  sv('pub-message', cfg.commitMessage);
+  sv('pub-token', cfg.token);
+  sv('pub-hook', cfg.deployHook);
+  sv('pub-last', cfg.lastPublished);
+  const auto = document.getElementById('pub-auto');
+  if (auto) auto.value = cfg.autoPublish ? 'true' : 'false';
+  toggleDeployFields();
+}
+
+function collectPublishConfig() {
+  const current = getPublishConfig();
+  const next = {
+    ...current,
+    platform: gv('pub-platform') || current.platform || 'github',
+    owner: gv('pub-owner') || current.owner,
+    repo: gv('pub-repo') || current.repo,
+    branch: gv('pub-branch') || current.branch,
+    commitMessage: gv('pub-message') || current.commitMessage,
+    token: gv('pub-token') || current.token,
+    deployHook: gv('pub-hook') ?? current.deployHook,
+    autoPublish: gv('pub-auto') === 'true'
+  };
+  savePublishConfig(next);
+  return next;
+}
+
+function utf8ToBase64(value) {
+  const bytes = new TextEncoder().encode(value);
+  let binary = '';
+  bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+  return btoa(binary);
+}
+
+function setButtonsBusy(isBusy) {
+  document.querySelectorAll('.btn-save, .btn-export, .admin-ghost-btn').forEach((btn) => {
+    if (btn.classList.contains('btn-home')) return;
+    btn.disabled = isBusy;
+  });
+}
+
+function toggleDeployFields() {
+  const el = document.getElementById('github-fields');
+  if (!el) return;
+  el.classList.toggle('hidden', (gv('pub-platform') || 'github') !== 'github');
+}
+
+async function triggerDeployHook(url) {
+  if (!url) return;
+  try { await fetch(url, { method: 'POST' }); }
+  catch (e) { console.warn('Deploy hook error:', e.message); }
+}
+
+async function publishContentJSON() {
+  const cfg = collectPublishConfig();
+  if (!cfg.token) {
+    setStatus('No GitHub token — see Global Settings → Deploy Settings.', 'warn');
+    return false;
+  }
+
+  setButtonsBusy(true);
+  setStatus('Publishing to GitHub…', 'busy');
+
+  try {
+    const endpoint = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/public/content.json`;
+    const headers = {
+      'Accept': 'application/vnd.github+json',
+      'Authorization': `Bearer ${cfg.token}`
+    };
+
+    const currentRes = await fetch(`${endpoint}?ref=${encodeURIComponent(cfg.branch)}`, { headers });
+    if (!currentRes.ok) {
+      throw new Error(`Could not read public/content.json (${currentRes.status})`);
+    }
+    const current = await currentRes.json();
+
+    const body = {
+      message: cfg.commitMessage || 'Update site content from admin',
+      content: utf8ToBase64(JSON.stringify(DATA, null, 2)),
+      sha: current.sha,
+      branch: cfg.branch
+    };
+
+    const publishRes = await fetch(endpoint, {
+      method: 'PUT',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!publishRes.ok) {
+      const err = await publishRes.json().catch(() => ({}));
+      throw new Error(err.message || `Publish failed (${publishRes.status})`);
+    }
+
+    const stamp = new Date().toLocaleString('en-US', { hour12: false });
+    const saved = { ...cfg, lastPublished: stamp };
+    savePublishConfig(saved);
+    const pubLast = document.getElementById('pub-last');
+    if (pubLast) pubLast.value = stamp;
+    markDirty(false);
+    setStatus('Published — deploy triggered.', 'ok');
+    if (cfg.deployHook) await triggerDeployHook(cfg.deployHook);
+    return true;
+  } catch (err) {
+    setStatus(`Publish failed: ${err.message}`, 'err');
+    return false;
+  } finally {
+    setButtonsBusy(false);
+  }
+}
+
+async function publishLive() {
+  if (currentPostSlug) savePost();
+  collectAll();
+  const cfg = collectPublishConfig();
+  localStorage.setItem('tatc_cms', JSON.stringify(DATA));
+  if (cfg.platform === 'download') {
+    exportJSON();
+    setStatus('JSON downloaded — commit and push to deploy.', 'ok');
+    return;
+  }
+  await publishContentJSON();
 }
 
 // ── PANELS ──
@@ -223,6 +389,28 @@ PANELS.global = () => `
   <div class="fld"><label>Blog Label</label><input class="fi" id="g-nav-blog"></div>
   <div class="fld"><label>Projects Label</label><input class="fi" id="g-nav-projects"></div>
   <div class="fld"><label>Info Label</label><input class="fi" id="g-nav-info"></div>
+</div></div>
+<div class="sec"><div class="sec-hd">Deploy Settings</div><div class="card">
+  <div class="fld" style="margin-bottom:1.25rem">
+    <label>Deploy Method</label>
+    <select class="fs" id="pub-platform" onchange="toggleDeployFields()">
+      <option value="github">GitHub API — commit content.json to repo (GitHub Pages, Netlify, Vercel, Render…)</option>
+      <option value="download">Download only — export JSON and commit manually</option>
+    </select>
+    <div class="hint">Both methods work on any hosting platform. GitHub API commits content.json to your repo, triggering an automatic deploy on any connected CI/CD.</div>
+  </div>
+  <div id="github-fields" class="github-fields-grid">
+    <div class="fld"><label>GitHub Owner / Org</label><input class="fi" id="pub-owner" placeholder="darielcurbelo26"></div>
+    <div class="fld"><label>Repository</label><input class="fi" id="pub-repo" placeholder="asi_test"></div>
+    <div class="fld"><label>Branch</label><input class="fi" id="pub-branch" placeholder="main"></div>
+    <div class="fld"><label>Commit Message</label><input class="fi" id="pub-message" placeholder="Update site content from admin"></div>
+    <div class="fld" style="grid-column:1/-1"><label>GitHub Token</label><input class="fi" id="pub-token" type="password" autocomplete="off" placeholder="Fine-grained personal access token (Contents: read + write)"><div class="hint">Stored only in this browser. Create at github.com → Settings → Developer settings → Fine-grained tokens → Contents: read &amp; write.</div></div>
+    <div class="fld" style="grid-column:1/-1"><label>Deploy Hook URL <span style="opacity:.4;font-weight:400;text-transform:none;letter-spacing:0">(optional — Netlify / Vercel)</span></label><input class="fi" id="pub-hook" placeholder="https://api.netlify.com/build_hooks/… or https://api.vercel.com/v1/integrations/deploy/…"><div class="hint">After committing, the admin will also POST to this URL to trigger an immediate rebuild.</div></div>
+  </div>
+  <div class="deploy-footer-grid">
+    <div class="fld"><label>Auto-publish on Save</label><select class="fs" id="pub-auto"><option value="false">Manual only</option><option value="true">Auto on Save Draft</option></select></div>
+    <div class="fld"><label>Last Published</label><input class="fi" id="pub-last" readonly></div>
+  </div>
 </div></div>`;
 
 PANELS.security = () => `
@@ -231,6 +419,18 @@ PANELS.security = () => `
   <div class="fld"><label>Default Password</label><input class="fi" id="sec-pass"><div class="hint">Fallback for private pages without a specific password</div></div>
   <div class="fld"><label>Gate Title (hero text)</label><input class="fi" id="sec-title"></div>
   <div class="fld" style="grid-column:1/-1"><label>Gate Description / Teaser</label><textarea class="ft" id="sec-desc" style="min-height:60px"></textarea></div>
+</div></div>
+<div class="sec"><div class="sec-hd">Admin Gate</div><div class="card grid2">
+  <div class="fld"><label>Admin Password</label><input class="fi" id="sec-admin-pass"><div class="hint">Separate password for the admin panel. Falls back to the default if blank.</div></div>
+  <div class="fld"><label>Admin Recovery Code</label><input class="fi" id="sec-admin-recovery"><div class="hint">Emergency bypass code for the admin gate (keep secret).</div></div>
+</div></div>
+<div class="sec"><div class="sec-hd">Lockout & Hint</div><div class="card grid2">
+  <div class="fld"><label>Max Failed Attempts</label><input class="fi" id="sec-max-attempts" type="number" min="1" max="20" placeholder="5"><div class="hint">How many wrong guesses before lockout. Default: 5.</div></div>
+  <div class="fld"><label>Lockout Duration (minutes)</label><input class="fi" id="sec-lockout-mins" type="number" min="1" max="1440" placeholder="30"><div class="hint">How long the gate stays locked. Default: 30 min.</div></div>
+  <div class="fld"><label>Show Hint After (attempts)</label><input class="fi" id="sec-hint-after" type="number" min="1" max="20" placeholder="3"><div class="hint">Show the password hint after this many failed attempts.</div></div>
+  <div class="fld"><label>Password Hint</label><input class="fi" id="sec-hint-text" placeholder="e.g. It's the name of the project"><div class="hint">Shown to the user after too many failed attempts. Leave blank to hide.</div></div>
+  <div class="fld"><label>Recovery Code</label><input class="fi" id="sec-recovery-code"><div class="hint">A secret bypass code for locked-out users. Works in addition to the actual password.</div></div>
+  <div class="fld"><label>Recovery Email</label><input class="fi" id="sec-recovery-email" type="email" placeholder="you@example.com"><div class="hint">Shown when locked out — users can email this address for help.</div></div>
 </div></div>
 <div class="sec"><div class="sec-hd">Page Visibility & Passwords</div>
 <div class="hint" style="margin-bottom:.75rem;color:rgba(255,255,255,.25);font-size:.78rem">Private pages use the password.html gate. Leave &quot;Page Password&quot; blank to use the default.</div>
@@ -330,7 +530,9 @@ function renderPanel(id) {
   const main = document.getElementById('main-area');
   const fn = PANELS[id];
   if (!fn) return;
-  main.innerHTML = `<div id="p-${id}" class="panel active">${fn()}</div>`;
+  main.innerHTML = `${getOverviewCards(id)}<div id="p-${id}" class="panel active">${fn()}</div>`;
+  const lbl = document.getElementById('sb-active-label');
+  if (lbl) lbl.textContent = NAV.find(n => n.id === id)?.label || id;
   fillPanel(id);
 }
 
@@ -342,9 +544,18 @@ function fillPanel(id) {
     sv('g-brand',g.brand);sv('g-tagline',g.tagline);sv('g-year',g.year);
     sv('g-tw',g.social?.twitter);sv('g-ig',g.social?.instagram);sv('g-email',g.social?.email);
     sv('g-nav-blog',g.nav?.blog);sv('g-nav-projects',g.nav?.projects);sv('g-nav-info',g.nav?.info);
+    fillPublishConfigFields();
   }
   if (id==='security') {
     sv('sec-pass',s.gate_password);sv('sec-title',s.gate_title);sv('sec-desc',s.gate_description);
+    sv('sec-admin-pass', s.admin_password);
+    sv('sec-admin-recovery', s.admin_recovery_code);
+    sv('sec-max-attempts', s.max_attempts);
+    sv('sec-lockout-mins', s.lockout_minutes);
+    sv('sec-hint-after', s.hint_after_attempts);
+    sv('sec-hint-text', s.password_hint);
+    sv('sec-recovery-code', s.recovery_code);
+    sv('sec-recovery-email', s.recovery_email);
     renderVisMatrix(s);
   }
   if (id==='typo') fillTypo(ty);
@@ -593,62 +804,96 @@ function renderArtList(){
 
 // ── COLLECT ALL ──
 function collectAll(){
-  // Global
+  const setValueIfPresent = (target, key, id) => {
+    const value = gv(id);
+    if (value !== null) target[key] = value;
+  };
+
   const g=DATA.global||{};DATA.global=g;
-  g.brand=gv('g-brand');g.tagline=gv('g-tagline');g.year=gv('g-year');
-  g.social={twitter:gv('g-tw'),instagram:gv('g-ig'),email:gv('g-email')};
-  g.nav={blog:gv('g-nav-blog'),projects:gv('g-nav-projects'),info:gv('g-nav-info')};
-  // Security
+  g.social = g.social || {};
+  g.nav = g.nav || {};
+  setValueIfPresent(g, 'brand', 'g-brand');
+  setValueIfPresent(g, 'tagline', 'g-tagline');
+  setValueIfPresent(g, 'year', 'g-year');
+  setValueIfPresent(g.social, 'twitter', 'g-tw');
+  setValueIfPresent(g.social, 'instagram', 'g-ig');
+  setValueIfPresent(g.social, 'email', 'g-email');
+  setValueIfPresent(g.nav, 'blog', 'g-nav-blog');
+  setValueIfPresent(g.nav, 'projects', 'g-nav-projects');
+  setValueIfPresent(g.nav, 'info', 'g-nav-info');
+
   const s=DATA.security||{};DATA.security=s;
-  if(gv('sec-pass'))s.gate_password=gv('sec-pass');
-  if(gv('sec-title'))s.gate_title=gv('sec-title');
-  if(gv('sec-desc'))s.gate_description=gv('sec-desc');
-  // Home
+  setValueIfPresent(s, 'gate_password', 'sec-pass');
+  setValueIfPresent(s, 'gate_title', 'sec-title');
+  setValueIfPresent(s, 'gate_description', 'sec-desc');
+  setValueIfPresent(s, 'admin_password', 'sec-admin-pass');
+  setValueIfPresent(s, 'admin_recovery_code', 'sec-admin-recovery');
+  const maxAttempts = gv('sec-max-attempts'); if (maxAttempts !== null) s.max_attempts = parseInt(maxAttempts, 10) || 5;
+  const lockoutMins = gv('sec-lockout-mins'); if (lockoutMins !== null) s.lockout_minutes = parseInt(lockoutMins, 10) || 30;
+  const hintAfter = gv('sec-hint-after'); if (hintAfter !== null) s.hint_after_attempts = parseInt(hintAfter, 10) || 3;
+  setValueIfPresent(s, 'password_hint', 'sec-hint-text');
+  setValueIfPresent(s, 'recovery_code', 'sec-recovery-code');
+  setValueIfPresent(s, 'recovery_email', 'sec-recovery-email');
+  setValueIfPresent(s, 'gate_title', 'pw-title');
+  setValueIfPresent(s, 'gate_description', 'pw-desc');
+  setValueIfPresent(s, 'gate_password', 'pw-pass');
+
   const h=DATA.home||{};DATA.home=h;
-  if(gv('h-meta'))h.meta_title=gv('h-meta');
-  if(gv('h-hero'))h.hero_headline=gv('h-hero');
-  if(gv('h-loader'))h.loader_text=gv('h-loader');
-  if(gv('h-skip'))h.loader_skip_label=gv('h-skip');
-  // Blog
+  setValueIfPresent(h, 'meta_title', 'h-meta');
+  setValueIfPresent(h, 'hero_headline', 'h-hero');
+  setValueIfPresent(h, 'loader_text', 'h-loader');
+  setValueIfPresent(h, 'loader_skip_label', 'h-skip');
+
   const b=DATA.blog||{};DATA.blog=b;
-  if(gv('b-meta'))b.meta_title=gv('b-meta');
-  if(gv('b-title'))b.page_title=gv('b-title');
-  if(gv('b-label'))b.page_label=gv('b-label');
-  // Password (mirrors security gate)
-  if(gv('pw-title'))DATA.security.gate_title=gv('pw-title');
-  if(gv('pw-desc'))DATA.security.gate_description=gv('pw-desc');
-  if(gv('pw-pass'))DATA.security.gate_password=gv('pw-pass');
-  // Gallery
+  setValueIfPresent(b, 'meta_title', 'b-meta');
+  setValueIfPresent(b, 'page_title', 'b-title');
+  setValueIfPresent(b, 'page_label', 'b-label');
+
   const g3=DATA.gallery_3d||{};DATA.gallery_3d=g3;
-  if(gv('gal-meta'))g3.meta_title=gv('gal-meta');
-  if(gv('gal-hud'))g3.hud_label=gv('gal-hud');
-  if(gv('gal-loader'))g3.loader_text=gv('gal-loader');
-  if(gv('gal-credits'))g3.credits=gv('gal-credits');
-  if(gv('gal-audio'))g3.audio_src=gv('gal-audio');
-  // Typography
-  const ty={};DATA.typography=ty;
-  ['heading_h1','heading_h2','nav','body','label'].forEach(k=>{
-    ty[k]={font_size:gv(`ty-${k}-size`),font_weight:gv(`ty-${k}-weight`),letter_spacing:gv(`ty-${k}-spacing`),text_transform:gv(`ty-${k}-transform`)};
-  });
-  // Artist
+  setValueIfPresent(g3, 'meta_title', 'gal-meta');
+  setValueIfPresent(g3, 'hud_label', 'gal-hud');
+  setValueIfPresent(g3, 'loader_text', 'gal-loader');
+  setValueIfPresent(g3, 'credits', 'gal-credits');
+  setValueIfPresent(g3, 'audio_src', 'gal-audio');
+
+  const hasTypoFields = document.getElementById('ty-heading_h1-size');
+  if (hasTypoFields) {
+    const ty={};DATA.typography=ty;
+    ['heading_h1','heading_h2','nav','body','label'].forEach(k=>{
+      ty[k]={
+        font_size:gv(`ty-${k}-size`) || '',
+        font_weight:gv(`ty-${k}-weight`) || '',
+        letter_spacing:gv(`ty-${k}-spacing`) || '',
+        text_transform:gv(`ty-${k}-transform`) || 'none'
+      };
+    });
+  }
+
   const ar=DATA.artist||{};DATA.artist=ar;
-  if(gv('ar-name'))ar.name=gv('ar-name');
-  if(gv('ar-label'))ar.label=gv('ar-label');
-  if(gv('ar-bio1'))ar.bio1=gv('ar-bio1');
-  if(gv('ar-bio2'))ar.bio2=gv('ar-bio2');
+  setValueIfPresent(ar, 'name', 'ar-name');
+  setValueIfPresent(ar, 'label', 'ar-label');
+  setValueIfPresent(ar, 'bio1', 'ar-bio1');
+  setValueIfPresent(ar, 'bio2', 'ar-bio2');
 }
 
-function saveAll(){
+async function saveAll(){
   if(currentPostSlug)savePost();
   collectAll();
-  // Save to localStorage — cms-engine.js picks this up site-wide
+  const publishCfg = collectPublishConfig();
   localStorage.setItem('tatc_cms', JSON.stringify(DATA));
   markDirty(false);
-  setStatus('Saved — site updated ✓','ok');
+  setStatus('Draft saved.','ok');
+  if (publishCfg.autoPublish) {
+    if (publishCfg.platform === 'download') { exportJSON(); }
+    else { await publishContentJSON(); }
+  }
 }
 
 function exportJSON(){
-  saveAll();
+  if(currentPostSlug)savePost();
+  collectAll();
+  collectPublishConfig();
+  localStorage.setItem('tatc_cms', JSON.stringify(DATA));
   const blob=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='content.json';a.click();
@@ -658,7 +903,7 @@ function exportJSON(){
 
 // ── UTILS ──
 function sv(id,val){ const el=document.getElementById(id); if(el&&val!==undefined&&val!==null)el.value=val; }
-function gv(id){ const el=document.getElementById(id); return el?el.value:''; }
+function gv(id){ const el=document.getElementById(id); return el ? el.value : null; }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function livePreview(){}
 

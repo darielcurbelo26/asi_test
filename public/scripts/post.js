@@ -5,7 +5,7 @@
         const post = data && data.post && data.post.posts && data.post.posts[slug];
         if (!post) return;
 
-        document.title = post.meta_title;
+        document.title = 'TATC';
 
         document.getElementById('post-date').textContent = post.date;
         document.getElementById('post-subject').textContent = post.subject;

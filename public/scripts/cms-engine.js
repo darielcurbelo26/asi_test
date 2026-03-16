@@ -27,7 +27,7 @@
     }
 
     if (el.tagName === 'TITLE') {
-      document.title = value;
+      document.title = 'TATC';
       return;
     }
 

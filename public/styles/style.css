@@ -258,6 +258,12 @@ body.theme-switching .nav_component .difference-text div {
     background-color: transparent !important;
 }
 
+.project-page-a-sweet-kid .nav_component .text-style-nav,
+.project-page-a-sweet-kid .nav_component .text-style-nav *,
+.project-page-a-sweet-kid .nav_component .difference-text {
+    color: #ffffff !important;
+}
+
 .projects-page .nav_component .nav_button div {
     background-color: #ffffff !important;
     mix-blend-mode: normal !important;
@@ -267,6 +273,10 @@ body.theme-switching .nav_component .difference-text div {
 .project-page-a-sweet-kid .nav_component .nav_button div {
     background-color: var(--text-color) !important;
     mix-blend-mode: normal !important;
+}
+
+.project-page-a-sweet-kid .nav_component .nav_button div {
+    background-color: #ffffff !important;
 }
 
 /* Burger negro en escritorio cuando el menú está abierto (Solo Projects Page) */

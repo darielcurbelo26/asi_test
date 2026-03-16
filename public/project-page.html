@@ -76,6 +76,16 @@
     .project-cta-btn:hover { opacity: 1; }
     /* Section spacer */
     .section-spacer { height: 4rem; }
+
+    /* Keep top-left TATC logo visible on project detail pages. */
+    .project-brand-link {
+      mix-blend-mode: normal !important;
+      color: var(--text-color) !important;
+    }
+    .project-brand-link .text-inner,
+    .project-brand-link .text-outer {
+      color: inherit !important;
+    }
   </style>
 </head>
 <body>
@@ -83,7 +93,7 @@
 
   <nav class="nav_component">
     <div class="nav_container">
-      <a href="index.html" class="text-style-nav difference-text">
+      <a href="index.html" class="text-style-nav project-brand-link">
         <span class="hover-split-text">
           <span class="text-inner" data-cms="global.brand">TATC</span>
           <span class="text-outer" data-cms="global.brand">TATC</span>

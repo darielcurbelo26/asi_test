@@ -130,8 +130,8 @@ function buildProjectDetailFromTemplate(slug, listItem){
     gallery_images: []
   };
 
-  base.meta_title = base.meta_title || '';
   base.title = listItem?.title || base.title || slug;
+  base.meta_title = `${base.title} — TATC`;
   base.subtitle = '';
   base.date = listItem?.date || '';
   base.location = listItem?.loc || '';

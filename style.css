@@ -147,6 +147,22 @@ a {
     transform: translateY(0);
 }
 
+/* Avoid flicker artifacts during theme switching (blend-mode re-composite) */
+body.theme-switching .nav_component {
+    mix-blend-mode: normal !important;
+    color: var(--text-color) !important;
+}
+
+body.theme-switching .nav_component .difference-text,
+body.theme-switching .nav_component .difference-text * {
+    mix-blend-mode: normal !important;
+    color: var(--text-color) !important;
+}
+
+body.theme-switching .nav_component .difference-text div {
+    background: currentColor !important;
+}
+
 /* --- AJUSTES ESPECÍFICOS PARA PROJECTS PAGE --- */
 /* Forzar elementos del nav a blanco SIEMPRE (No blend mode) 
    según requerimiento de usuario solo para esta página */

@@ -165,6 +165,8 @@ const NAV = [
   { id:'projects', label:'Projects List',    icon:'⊟',  cat:null,    view:'../projects.html' },
   { id:'project',  label:'Project Detail',   icon:'⊡',  cat:null,    view:'../project-page.html?project=a-sweet-kid' },
   { id:'gallery',  label:'3D Gallery',       icon:'◈',  cat:null,    view:'../a-sweet-kid-online.html' },
+  { id:'photo-gallery', label:'Photo Gallery', icon:'⊞', cat:null,   view:'../gallery.html' },
+  { id:'asweetkid', label:'A Sweet Kid',     icon:'⬡',  cat:null,    view:'../a-sweet-kid.html' },
   { id:'artist',   label:'Artist / Info',    icon:'◎',  cat:null,    view:'../artist.html' },
 ];
 
@@ -515,6 +517,20 @@ PANELS.gallery = () => `
 </div></div>
 <div class="sec"><div class="sec-hd">Artworks</div><div id="art-list"></div></div>`;
 
+PANELS['photo-gallery'] = () => `
+<div class="ph"><div class="ph-cat">Page</div><div class="ph-title">Photo Gallery</div><div class="ph-desc">The scrollable photo grid at gallery.html. Images are loaded from the artworks folder — no CMS fields needed.</div></div>
+<div class="sec"><div class="card" style="display:flex;align-items:center;gap:1.5rem;padding:1.5rem">
+  <div style="flex:1;color:var(--muted);font-size:.9rem;line-height:1.6">The photo gallery pulls images directly from <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;opacity:.75">assets/artworks/</code>. To add or remove images, update that folder and redeploy.</div>
+  <a class="btn-accent" style="text-decoration:none;padding:.65rem 1.1rem;flex-shrink:0" href="../gallery.html" target="_blank" rel="noopener">Open Gallery \u2197</a>
+</div></div>`;
+
+PANELS.asweetkid = () => `
+<div class="ph"><div class="ph-cat">Page</div><div class="ph-title">A Sweet Kid</div><div class="ph-desc">The landing / project page for the "A Sweet Kid" installation.</div></div>
+<div class="sec"><div class="card" style="display:flex;align-items:center;gap:1.5rem;padding:1.5rem">
+  <div style="flex:1;color:var(--muted);font-size:.9rem;line-height:1.6">Content for this page is hardcoded in <code style="font-family:'IBM Plex Mono',monospace;font-size:.85em;opacity:.75">a-sweet-kid.html</code>. The body copy, carousel images, and overlay gallery are managed directly in that file.</div>
+  <a class="btn-accent" style="text-decoration:none;padding:.65rem 1.1rem;flex-shrink:0" href="../a-sweet-kid.html" target="_blank" rel="noopener">Open Page \u2197</a>
+</div></div>`;
+
 PANELS.artist = () => `
 <div class="ph"><div class="ph-cat">Page</div><div class="ph-title">Artist / Info</div></div>
 <div class="sec"><div class="sec-hd">Content</div><div class="card">
@@ -570,7 +586,7 @@ function fillPanel(id) {
 }
 
 // ── VIS MATRIX ──
-const ALL_PAGES = ['index.html','projects.html','artist.html','blog.html','a-sweet-kid.html','a-sweet-kid-online.html','password.html'];
+const ALL_PAGES = ['index.html','projects.html','artist.html','blog.html','a-sweet-kid.html','a-sweet-kid-online.html','gallery.html','password.html'];
 function renderVisMatrix(s) {
   const pages = s.pages||{}, pwds = s.page_passwords||{};
   const el = document.getElementById('vis-body');

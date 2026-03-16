@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Hidden by default to avoid flash, but managed by to()
-    gsap.set('.nav_component, .heading-style-h1, .section_hero-title-password, .not-found-title, .fixed-controls_component > *, .nav_list a, .text-size-regular, .text-style-label, .not-found-sub, .password-form', {
+    gsap.set('.nav_component, .heading-style-h1, .section_hero-title-password, .not-found-title, .fixed-controls_component > *, .text-size-regular, .text-style-label, .not-found-sub, .password-form', {
         opacity: 0
     });
 
@@ -328,17 +328,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const burger = document.getElementById('nav_button-menu');
     const rightNavbar = document.querySelector('.nav_menu');
     if (burger && rightNavbar) {
+        const menuLinks = rightNavbar.querySelectorAll('.nav_list a, .nav_list a .text-inner, .nav_list a .text-outer');
+
+        function forceMenuLinksVisible(enable) {
+            menuLinks.forEach((el) => {
+                if (enable) {
+                    el.style.opacity = '1';
+                    el.style.visibility = 'visible';
+                } else {
+                    el.style.opacity = '';
+                    el.style.visibility = '';
+                }
+            });
+        }
+
         function openMenu() {
             burger.classList.add('active');
             rightNavbar.classList.add('active');
             document.body.classList.add('menu-open');    // CSS lock
             document.body.style.overflow = 'hidden';     // JS lock
+            forceMenuLinksVisible(true);
         }
         function closeMenu() {
             burger.classList.remove('active');
             rightNavbar.classList.remove('active');
             document.body.classList.remove('menu-open'); // CSS unlock
             document.body.style.overflow = '';            // JS unlock
+            forceMenuLinksVisible(false);
         }
 
         burger.addEventListener('click', (e) => {

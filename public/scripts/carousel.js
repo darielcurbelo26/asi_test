@@ -222,7 +222,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function applySlideWidth(slideEl, src) {
             const ratio = imageRatioCache.get(src);
-            if (!ratio) return;
+            if (!ratio) {
+                const fallback = Math.max(1, Math.round((estimatedSpan - gap)));
+                slideEl.style.width = `${fallback}px`;
+                slideEl.dataset.span = String(fallback + gap);
+                return;
+            }
 
             const slideHeight = slideEl.offsetHeight || cardHeight;
             const width = Math.max(1, Math.round(slideHeight * ratio));
@@ -240,9 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 img.dataset.src = nextSrc;
                 applySlideWidth(slideEl, nextSrc);
                 if (img.getAttribute('src') !== nextSrc) img.src = nextSrc;
-                loadImageRatio(nextSrc).then(() => {
-                    if (img.dataset.src === nextSrc) applySlideWidth(slideEl, nextSrc);
-                });
+                loadImageRatio(nextSrc);
             }
         }
 
@@ -314,26 +317,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Recycle helper: keeps currentX within [-span(first), 0]
         function recycle() {
-            // Move first -> end when drifting left too far
-            while (track.firstElementChild && currentX <= -getSlideSpan(track.firstElementChild)) {
-                const first = track.firstElementChild;
-                const span = getSlideSpan(first);
-                currentX += span;
-                headLogicalIndex += 1;
-                tailLogicalIndex += 1;
-                track.appendChild(first);
-                setSlideToLogicalIndex(first, tailLogicalIndex);
-            }
+            let guard = 0;
 
-            // Move last -> front when drifting right (positive x)
-            while (track.lastElementChild && currentX >= 0) {
-                const last = track.lastElementChild;
-                const span = getSlideSpan(last);
-                currentX -= span;
-                headLogicalIndex -= 1;
-                tailLogicalIndex -= 1;
-                track.insertBefore(last, track.firstElementChild);
-                setSlideToLogicalIndex(last, headLogicalIndex);
+            // Move first -> end when drifting left too far
+            if (currentX <= -getSlideSpan(track.firstElementChild)) {
+                while (track.firstElementChild && currentX <= -getSlideSpan(track.firstElementChild)) {
+                    const first = track.firstElementChild;
+                    const span = getSlideSpan(first);
+                    currentX += span;
+                    headLogicalIndex += 1;
+                    tailLogicalIndex += 1;
+                    track.appendChild(first);
+                    setSlideToLogicalIndex(first, tailLogicalIndex);
+
+                    guard += 1;
+                    if (guard > 80) break;
+                }
+            } else if (currentX >= 0) {
+                // Move last -> front when drifting right (positive x)
+                while (track.lastElementChild && currentX >= 0) {
+                    const last = track.lastElementChild;
+                    const span = getSlideSpan(last);
+                    currentX -= span;
+                    headLogicalIndex -= 1;
+                    tailLogicalIndex -= 1;
+                    track.insertBefore(last, track.firstElementChild);
+                    setSlideToLogicalIndex(last, headLogicalIndex);
+
+                    guard += 1;
+                    if (guard > 80) break;
+                }
             }
         }
 

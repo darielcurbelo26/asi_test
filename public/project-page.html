@@ -182,6 +182,10 @@
     const params = new URLSearchParams(location.search);
     const slug   = params.get('project') || params.get('slug') || '';
 
+    if (slug) {
+      document.body.classList.add(`project-page-${slug}`);
+    }
+
     document.addEventListener('cms:ready', ({ detail: data }) => {
       const projects = (data.projects_detail) || {};
       const p = projects[slug];

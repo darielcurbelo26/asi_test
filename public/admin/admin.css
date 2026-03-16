@@ -47,6 +47,12 @@ button {
     overflow: hidden;
 }
 
+/* Disable page-transition curtain inside admin to avoid blocking focus/typing. */
+body.admin-body .transition-overlay {
+    display: none !important;
+    pointer-events: none !important;
+}
+
 /* ── HEADER ── */
 .admin-header-shell {
     flex: 0 0 var(--header-height);

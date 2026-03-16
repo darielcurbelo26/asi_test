@@ -1417,6 +1417,35 @@ body.dark-mode .not-found-ui-layer {
     color: #b30000;
 }
 
+/* Temporary visual for A Sweet Kid title using favicon artwork. */
+.a-sweet-kid-page .heading-style-h1-image {
+    position: relative;
+}
+
+.a-sweet-kid-page .heading-style-h1-image .h1-image-placeholder {
+    visibility: hidden;
+}
+
+.a-sweet-kid-page .heading-style-h1-image img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+/* Project detail page: both artist links in A Sweet Kid CDMX description must be red. */
+.project-page-a-sweet-kid #proj-body a,
+.project-page-a-sweet-kid #proj-body a.bold-link {
+    color: #d40000;
+}
+
+.project-page-a-sweet-kid #proj-body a:hover,
+.project-page-a-sweet-kid #proj-body a.bold-link:hover {
+    color: #b30000;
+}
+
 /* Effect to 'separate' or change the font for the hover state */
 .alternate-font .text-inner,
 .alternate-font .text-outer {

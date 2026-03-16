@@ -43,16 +43,28 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     }
 
+    const isProjectPage = document.body.classList.contains('project-page-template')
+        || document.body.classList.contains('project-page-a-sweet-kid');
+
+    const brandClasses = ['text-style-nav'];
+    const burgerClasses = ['nav_button', 'difference-text'];
+
+    if (isProjectPage) {
+        brandClasses.push('project-brand-link');
+    } else {
+        brandClasses.push('difference-text');
+    }
+
     const navHTML = `
         <nav class="nav_component">
             <div class="nav_container">
-                <a href="index.html" class="text-style-nav difference-text">
+                <a href="index.html" class="${brandClasses.join(' ')}">
                     <span class="hover-split-text">
                         <span class="text-inner" data-cms="global.brand">TATC</span>
                         <span class="text-outer" data-cms="global.brand">TATC</span>
                     </span>
                 </a>
-                <div class="nav_button difference-text" id="nav_button-menu">
+                <div class="${burgerClasses.join(' ')}" id="nav_button-menu">
                     <div></div>
                     <div></div>
                     <div></div>

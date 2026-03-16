@@ -588,6 +588,46 @@ body:not(.is-dirty) .btn-save {
     object-fit: cover;
     border-radius: 10px;
     border: 1px solid rgba(242, 242, 242, 0.12);
+
+.proj-img-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: .9rem;
+}
+
+.proj-img-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: .75rem;
+}
+
+.proj-img-card {
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    padding: .45rem;
+    display: flex;
+    flex-direction: column;
+    gap: .45rem;
+}
+
+.proj-img-card img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border: 1px solid var(--border-color);
+}
+
+.proj-img-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .68rem;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
     background: rgba(0, 0, 0, 0.25);
 }
 

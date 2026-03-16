@@ -7,34 +7,108 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; connect-src 'self'; frame-src 'self';">
-    <title>A Sweet Kid</title>
+    <title data-cms-project="meta_title">Project — TATC</title>
     <link rel="stylesheet" href="styles/style.css">
+    <script src="scripts/cms-engine.js" defer></script>
     <script src="scripts/design-system.js"></script>
+    <style>
+        .project-hero-kicker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem 2rem;
+            align-items: baseline;
+            margin-bottom: .5rem;
+            margin-top: 1.5rem;
+        }
+
+        .project-kicker-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: .7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: .45;
+        }
+
+        .project-kicker-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: .7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: .7;
+        }
+
+        @media (max-width: 768px) {
+            .project-hero-kicker {
+                justify-content: center;
+                text-align: center;
+                gap: .45rem 1rem;
+            }
+
+            .project-kicker-label,
+            .project-kicker-value {
+                text-align: center;
+            }
+        }
+
+        .project-body-text {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .project-body-text p+p {
+            margin-top: 1.5rem;
+        }
+
+        .project-cta-wrapper {
+            display: flex;
+            justify-content: center;
+            padding: 3rem 0 1rem;
+        }
+
+        .project-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: .75rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid currentColor;
+            padding: 1.2rem 3rem;
+            transition: background .3s, color .3s;
+            opacity: .6;
+        }
+
+        .project-cta-btn:hover {
+            opacity: 1;
+        }
+
+        .section-spacer {
+            height: 4rem;
+        }
+    </style>
 </head>
 
-<body class="a-sweet-kid-page">
+<body class="a-sweet-kid-page project-page-a-sweet-kid">
     <div class="transition-overlay" style="background:black;"></div>
 
     <nav class="nav_component">
         <div class="nav_container">
             <a href="index.html" class="text-style-nav difference-text">
                 <span class="hover-split-text">
-                    <span class="text-inner">TATC</span>
-                    <span class="text-outer">TATC</span>
+                    <span class="text-inner" data-cms="global.brand">TATC</span>
+                    <span class="text-outer" data-cms="global.brand">TATC</span>
                 </span>
             </a>
             <div class="nav_button difference-text" id="nav_button-menu">
-                <div></div>
-                <div></div>
-                <div></div>
+                <div></div><div></div><div></div>
             </div>
         </div>
     </nav>
 
     <div class="page-wrapper">
-
-
-
         <div class="fixed-controls_component">
             <div class="icon-button is-cube" title="Toggle Visibility"></div>
             <div class="icon-button is-square" title="Toggle Theme"></div>
@@ -43,68 +117,50 @@
         <nav class="nav_menu">
             <div class="nav_container nav_menu-container">
                 <div class="nav_list">
-                    <a href="index.html" class="text-style-nav nav_link">
-                        <span class="hover-split-text">
-                            <span class="text-inner">The gist</span>
-                            <span class="text-outer">The gist</span>
-                        </span>
+                    <a href="blog.html" class="text-style-nav nav_link">
+                        <span class="hover-split-text"><span class="text-inner" data-cms="global.nav.blog">The Gist</span><span class="text-outer" data-cms="global.nav.blog">The Gist</span></span>
                     </a>
                     <a href="projects.html" class="text-style-nav nav_link">
-                        <span class="hover-split-text">
-                            <span class="text-inner">Projects</span>
-                            <span class="text-outer">Projects</span>
-                        </span>
+                        <span class="hover-split-text"><span class="text-inner" data-cms="global.nav.projects">Projects</span><span class="text-outer" data-cms="global.nav.projects">Projects</span></span>
                     </a>
                     <a href="about.html" class="text-style-nav nav_link">
-                        <span class="hover-split-text">
-                            <span class="text-inner">Info</span>
-                            <span class="text-outer">Info</span>
-                        </span>
+                        <span class="hover-split-text"><span class="text-inner" data-cms="global.nav.info">Info</span><span class="text-outer" data-cms="global.nav.info">Info</span></span>
                     </a>
                 </div>
                 <div class="nav_list social_list">
-                    <a href="https://x.com" target="_blank" class="social_link"><img src="assets/social_icons/xx.svg"
-                            alt="xx"></a>
-                    <a href="mailto:ejemplo@correo.com" class="social_link"><img src="assets/social_icons/mail.svg"
-                            alt="mail"></a>
-                    <a href="https://www.instagram.com/throughalltheclutter/" target="_blank" rel="noopener noreferrer" class="social_link"><img
-                            src="assets/social_icons/instagram.svg" alt="instagram"></a>
+                    <a data-cms="global.social.twitter" data-cms-attr="href" target="_blank" class="social_link"><img src="assets/social_icons/xx.svg" alt="xx"></a>
+                    <a data-cms="global.social.email" data-cms-attr="href" class="social_link"><img src="assets/social_icons/mail.svg" alt="mail"></a>
+                    <a data-cms="global.social.instagram" data-cms-attr="href" target="_blank" class="social_link"><img src="assets/social_icons/instagram.svg" alt="instagram"></a>
                 </div>
             </div>
         </nav>
 
         <section class="section_hero layout_stack">
-            <h1 class="heading-style-h1 heading-style-h1-image" aria-label="A Sweet Kid">
+            <h1 class="heading-style-h1 heading-style-h1-image" id="proj-h1" aria-label="A Sweet Kid">
                 <span class="h1-image-placeholder">A Sweet Kid</span>
-                <img src="assets/fav_icon/A-Sweet-Kid-p-500.png" alt="A Sweet Kid">
+                <img src="assets/fav_icon/A-Sweet-Kid%20370.webp.webp" alt="A Sweet Kid">
             </h1>
-            <div class="heading-style-h2">
-                <h2> Mexico City Art Week 2025 <br>
-                    <a href="https://salonsilicon.com/" target="_blank" class="salon-link">Salon Silicon</a>
-                </h2>
+
+            <div class="project-hero-kicker" id="proj-kicker"></div>
+
+            <div class="heading-style-h2" id="proj-h2-wrap">
+                <h2 id="proj-h2"></h2>
             </div>
 
-            <div style="max-width: 800px; ">
-                <p class="text-size-regular text-center" style="margin-bottom: 2rem;">
-                    <a href="a-sweet-kid.html" class="bold-link">A Sweet Kid</a> was a multimedia installation that explored the fractured reality of living a double life.
-                    The 6' x 8' sterile padded space replicated an institutional solitary confinement cell with short
-                    film
-                    script pages lining the exterior to give visitors narrative context before entering.<br><br>
-
-                    Inside, they experienced a 13-minute spatial audio journey of evolving negative self-talk alongside
-                    commissioned
-                    paintings by artist <a href="https://www.shelbykeierleber.com/" target="_blank" class="bold-link">Shelby Keierleber</a> that explored fragmented identity. <br><br>
-
-                    This marked <a href="artist.html" class="bold-link">ISEEASI</a>'s first installation and spatial audio experience, building on her previous work
-                    examining
-                    personal trauma and social masks. The environment created a space where visitors could confront
-                    their
-                    own experiences of authenticity and performance in daily life.
-                </p>
+            <div class="project-body-text">
+                <p class="text-size-regular text-center" id="proj-body"></p>
             </div>
 
-            <div id="carrusel-galley" style="display: none;">
+            <div class="project-cta-wrapper" id="proj-cta-wrap" style="display:none">
+                <a id="proj-cta-btn" class="project-cta-btn" href="#">
+                    <span id="proj-cta-label">Enter Immersive Experience</span>
+                    <span>→</span>
+                </a>
             </div>
+
+            <div class="section-spacer"></div>
+
+            <div id="carrusel-galley" style="display:none"></div>
 
             <div id="carousel-root">
                 <div class="carousel-dual-wrapper">
@@ -120,29 +176,96 @@
                     </div>
                 </div>
             </div>
-
         </section>
     </div>
 
     <div id="carousel-cursor" class="carousel-cursor-follower">OPEN GALLERY</div>
 
     <div id="gallery-overlay">
-        <button class="overlay-btn overlay-close" id="overlay-close-btn">×</button>
-        <button class="overlay-btn overlay-prev">
-            <div class="css-arrow arrow-left"></div>
-        </button>
-        <div class="overlay-content">
-            <img id="overlay-img" src="" alt="Vista previa">
-        </div>
-        <button class="overlay-btn overlay-next">
-            <div class="css-arrow arrow-right"></div>
-        </button>
+        <button class="overlay-btn overlay-prev"><div class="css-arrow arrow-left"></div></button>
+        <div class="overlay-content"><img id="overlay-img" src="" alt="Preview"></div>
+        <button class="overlay-btn overlay-next"><div class="css-arrow arrow-right"></div></button>
     </div>
-
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="scripts/script.js"></script>
     <script src="scripts/carousel.js"></script>
+
+    <script>
+        (function () {
+            const slug = 'a-sweet-kid';
+
+            document.addEventListener('cms:ready', ({ detail: data }) => {
+                const projects = (data.projects_detail) || {};
+                const p = projects[slug];
+                const h1 = document.getElementById('proj-h1');
+                const placeholder = h1 ? h1.querySelector('.h1-image-placeholder') : null;
+
+                if (!p) {
+                    if (placeholder) placeholder.textContent = 'Project not found';
+                    if (h1) h1.setAttribute('aria-label', 'Project not found');
+                    return;
+                }
+
+                document.title = 'TATC';
+
+                if (placeholder) placeholder.textContent = p.title || '';
+                if (h1) h1.setAttribute('aria-label', p.title || '');
+
+                const kicker = document.getElementById('proj-kicker');
+                if (p.date || p.location || p.medium) {
+                    const chips = [
+                        p.date ? { label: 'Year', value: p.date } : null,
+                        p.location ? { label: 'Location', value: p.location } : null,
+                        p.medium ? { label: 'Medium', value: p.medium } : null,
+                    ].filter(Boolean);
+                    kicker.innerHTML = chips.map(c =>
+                        `<span class="project-kicker-label">${c.label}</span><span class="project-kicker-value">${c.value}</span>`
+                    ).join('');
+                }
+
+                const h2el = document.getElementById('proj-h2');
+                if (p.subtitle) {
+                    h2el.innerHTML = p.subtitle;
+                } else {
+                    document.getElementById('proj-h2-wrap').style.display = 'none';
+                }
+
+                const bodyEl = document.getElementById('proj-body');
+                if (Array.isArray(p.body)) {
+                    bodyEl.innerHTML = p.body.map(t => `<span>${t}</span>`).join('<br><br>');
+                } else if (p.body) {
+                    bodyEl.textContent = p.body;
+                }
+
+                if (p.immersive_url) {
+                    const wrap = document.getElementById('proj-cta-wrap');
+                    wrap.style.display = 'flex';
+                    document.getElementById('proj-cta-btn').href = p.immersive_url;
+                    if (p.immersive_cta_label) {
+                        document.getElementById('proj-cta-label').textContent = p.immersive_cta_label;
+                    }
+                }
+
+                const gallery = document.getElementById('carrusel-galley');
+                if (p.gallery_images && p.gallery_images.length) {
+                    gallery.innerHTML = p.gallery_images.map((src, i) =>
+                        `<img src="${src}" alt="Image ${i + 1}">`
+                    ).join('');
+                }
+            });
+
+            setTimeout(() => {
+                if (!window.TATC_CONTENT) {
+                    const h1 = document.getElementById('proj-h1');
+                    const placeholder = h1 ? h1.querySelector('.h1-image-placeholder') : null;
+                    if (placeholder && !placeholder.textContent.trim()) {
+                        placeholder.textContent = slug;
+                    }
+                }
+            }, 1500);
+        })();
+    </script>
 </body>
 
 </html>

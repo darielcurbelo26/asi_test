@@ -62,18 +62,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const mask = follower.querySelector('.cursor-mask');
         const innerText = follower.querySelector('.cursor-text');
 
+        let pointerClientX = window.innerWidth / 2;
+        let pointerClientY = window.innerHeight / 2;
         const xTo = gsap.quickTo(follower, 'x', { duration: 0.15, ease: 'power2.out' });
         const yTo = gsap.quickTo(follower, 'y', { duration: 0.15, ease: 'power2.out' });
         window.addEventListener('pointermove', (e) => {
-            xTo(e.clientX);
-            yTo(e.clientY);
+            pointerClientX = e.clientX;
+            pointerClientY = e.clientY;
+            xTo(pointerClientX);
+            yTo(pointerClientY);
         }, { passive: true });
 
         // ANIMACIÓN DE ENTRADA
         root.addEventListener('mouseenter', () => {
             follower.classList.add('active');
-            gsap.killTweensOf(follower);
-            gsap.set(follower, { opacity: 1 });
+            xTo(pointerClientX);
+            yTo(pointerClientY);
+            gsap.to(follower, {
+                opacity: 1,
+                duration: 0.12,
+                overwrite: 'auto'
+            });
 
             gsap.killTweensOf(mask);
             gsap.fromTo(mask,
@@ -92,11 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 ease: "power3.inOut"
             });
 
-            gsap.killTweensOf(follower);
             gsap.to(follower, {
                 opacity: 0,
                 duration: 0.1,
                 delay: 0.3,
+                overwrite: 'auto',
                 onComplete: () => follower.classList.remove('active')
             });
         });

@@ -1419,7 +1419,6 @@ body.dark-mode .not-found-ui-layer {
 /* A Sweet Kid title: hide text, show wordmark image in its place. */
 .a-sweet-kid-page .heading-style-h1-image {
     position: relative;
-    width: min(100%, 980px);
     /* cancel the global heading blur + scale so the image is crisp */
     transform: none;
     filter: none;
@@ -1432,18 +1431,18 @@ body.dark-mode .not-found-ui-layer {
 
 .a-sweet-kid-page .heading-style-h1-image img {
     position: absolute;
-    inset: 0;
+    top: 50%;
+    left: 50%;
     width: 100%;
     height: 100%;
+    transform: translate(-50%, -50%);
     object-fit: contain;
     object-position: center;
     pointer-events: none;
 }
 
-@media (max-width: 768px) {
-    .a-sweet-kid-page .heading-style-h1-image {
-        width: min(100%, 92vw);
-    }
+body.dark-mode.a-sweet-kid-page .heading-style-h1-image img {
+    filter: invert(1);
 }
 
 /* Project detail page: both artist links in A Sweet Kid CDMX description must be red. */

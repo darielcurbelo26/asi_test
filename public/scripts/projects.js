@@ -85,13 +85,14 @@
     }
 
     function normalizeProject(entry, idx) {
+        var isASweetKidProject = entry && (entry.link === 'project-page.html?project=a-sweet-kid' || entry.title === 'A Sweet Kid');
         return {
             id: entry.id != null ? entry.id : idx,
             title: entry.title || 'Untitled project',
             desc: entry.desc || '',
             date: entry.date || '',
             loc: entry.loc || '',
-            link: entry.link || '',
+            link: isASweetKidProject ? 'a-sweet-kid.html' : (entry.link || ''),
             src: entry.src || '',
             iframe: entry.iframe || entry.embed || ''
         };

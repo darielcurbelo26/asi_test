@@ -59,6 +59,7 @@ if (sessionStorage.getItem('tatc-admin-unlocked') !== 'true') {
 let DATA = {}, currentPostSlug = null;
 let IS_DIRTY = false;
 let PROJECT_DETAIL_TEMPLATE = null;
+const IMAGE_OPS = { uploads: {}, deletes: {} };
 const PUBLISH_CFG_KEY = 'tatc_admin_publish_cfg';
 const PUBLISH_DEFAULTS = {
   platform: 'github',
@@ -103,8 +104,91 @@ function markDirty(on=true){
 
 function extractProjectSlug(link){
   if (!link) return null;
+  if (String(link).trim() === 'a-sweet-kid.html') return 'a-sweet-kid';
   const m = String(link).match(/[?&](?:project|slug)=([^&]+)/);
   return m ? decodeURIComponent(m[1]) : null;
+}
+
+function getProjectDetailSegment(slug, section, bodyIndex){
+  const detail = DATA.projects_detail?.[slug];
+  if (!detail) return '';
+  if (section === 'subtitle') return String(detail.subtitle || '');
+  if (section === 'body') {
+    const body = Array.isArray(detail.body) ? detail.body : (detail.body ? [detail.body] : []);
+    return String(body[bodyIndex] || '');
+  }
+  return '';
+}
+
+function setProjectDetailSegment(slug, section, bodyIndex, value){
+  if (!DATA.projects_detail || !DATA.projects_detail[slug]) return;
+  if (section === 'subtitle') {
+    DATA.projects_detail[slug].subtitle = value;
+    return;
+  }
+  if (section === 'body') {
+    const body = Array.isArray(DATA.projects_detail[slug].body)
+      ? [...DATA.projects_detail[slug].body]
+      : (DATA.projects_detail[slug].body ? [DATA.projects_detail[slug].body] : []);
+    body[bodyIndex] = value;
+    DATA.projects_detail[slug].body = body;
+  }
+}
+
+function getProjectDetailLinks(slug){
+  const detail = DATA.projects_detail?.[slug];
+  if (!detail) return [];
+  const sections = [
+    { section: 'subtitle', bodyIndex: -1, label: 'Subtitle', html: String(detail.subtitle || '') },
+    ...(Array.isArray(detail.body) ? detail.body : (detail.body ? [detail.body] : [])).map((html, index) => ({
+      section: 'body',
+      bodyIndex: index,
+      label: `Body paragraph ${index + 1}`,
+      html: String(html || '')
+    }))
+  ];
+
+  return sections.flatMap(({ section, bodyIndex, label, html }) => {
+    const template = document.createElement('template');
+    template.innerHTML = html;
+    return Array.from(template.content.querySelectorAll('a')).map((anchor, linkIndex) => ({
+      section,
+      bodyIndex,
+      label,
+      linkIndex,
+      text: anchor.textContent || '',
+      href: anchor.getAttribute('href') || ''
+    }));
+  });
+}
+
+function updateProjectDetailLink(slug, section, bodyIndex, linkIndex, field, value){
+  const segment = getProjectDetailSegment(slug, section, bodyIndex);
+  const template = document.createElement('template');
+  template.innerHTML = segment;
+  const links = template.content.querySelectorAll('a');
+  const target = links[linkIndex];
+  if (!target) return;
+  if (field === 'text') target.textContent = value;
+  if (field === 'href') target.setAttribute('href', value);
+  setProjectDetailSegment(slug, section, bodyIndex, template.innerHTML);
+  markDirty(true);
+}
+
+function renderProjectDetailLinkEditor(slug){
+  const links = getProjectDetailLinks(slug);
+  if (!links.length) {
+    return `<div class="hint">No inline links found in subtitle or body for this project.</div>`;
+  }
+
+  return `<div class="card mb-sm" style="margin-top:.75rem">
+    <div class="sec-hd" style="margin-bottom:1rem;padding-left:0">Inline Description Links</div>
+    ${links.map(link => `<div class="grid2" style="gap:.5rem;margin-bottom:.9rem">
+      <div class="fld" style="grid-column:1/-1"><label>${esc(link.label)} · Link ${link.linkIndex + 1}</label><div class="hint">Edit the text and URL used inside the rich description HTML.</div></div>
+      <div class="fld"><label>Link Text</label><input class="fi" value="${esc(link.text)}" oninput="updateProjectDetailLink('${slug}','${link.section}',${link.bodyIndex},${link.linkIndex},'text',this.value)"></div>
+      <div class="fld"><label>Link URL</label><input class="fi" value="${esc(link.href)}" oninput="updateProjectDetailLink('${slug}','${link.section}',${link.bodyIndex},${link.linkIndex},'href',this.value)"></div>
+    </div>`).join('')}
+  </div>`;
 }
 
 function buildProjectDetailFromTemplate(slug, listItem){
@@ -279,6 +363,215 @@ function utf8ToBase64(value) {
   return btoa(binary);
 }
 
+function normalizeFileName(name) {
+  const trimmed = String(name || '').trim();
+  if (!trimmed) return `image-${Date.now()}.png`;
+  return trimmed
+    .replace(/\s+/g, '-')
+    .replace(/[^a-zA-Z0-9._-]/g, '');
+}
+
+function toApiPath(path) {
+  return String(path).split('/').map(encodeURIComponent).join('/');
+}
+
+function inferProjectImageFolder(slug) {
+  const items = DATA.projects?.items || [];
+  const bySlug = items.find((it) => extractProjectSlug(it.link) === slug);
+  const src = bySlug?.src || '';
+  const m = String(src).match(/^(.*\/images)\/[^/]+$/);
+  if (m) return m[1];
+  return `projects/${slug}/images`;
+}
+
+function ensureProjectGalleryImages(slug) {
+  if (!DATA.projects_detail) DATA.projects_detail = {};
+  if (!DATA.projects_detail[slug]) {
+    DATA.projects_detail[slug] = buildProjectDetailFromTemplate(slug, { title: slug, date:'', loc:'', desc:'' });
+  }
+  const p = DATA.projects_detail[slug];
+  if (!Array.isArray(p.gallery_images)) p.gallery_images = [];
+  return p.gallery_images;
+}
+
+function getProjectGalleryImages(slug) {
+  const folder = inferProjectImageFolder(slug);
+  const p = DATA.projects_detail?.[slug];
+  const gallery = Array.isArray(p?.gallery_images) ? p.gallery_images : [];
+  const inFolder = gallery.filter((src) => String(src).startsWith(`${folder}/`));
+
+  const item = (DATA.projects?.items || []).find((it) => extractProjectSlug(it.link) === slug);
+  const cover = item?.src && String(item.src).startsWith(`${folder}/`) ? [item.src] : [];
+
+  const uploadPaths = (IMAGE_OPS.uploads[slug] || []).map((u) => u.path);
+  const all = [...cover, ...inFolder, ...uploadPaths];
+  return [...new Set(all)].filter(Boolean);
+}
+
+function getImageOpsSummary(slug) {
+  return {
+    uploads: (IMAGE_OPS.uploads[slug] || []).length,
+    deletes: (IMAGE_OPS.deletes[slug] || []).length
+  };
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || '');
+      const base64 = result.includes(',') ? result.split(',')[1] : result;
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function queueProjectImagesUpload(slug, filesLike) {
+  const files = Array.from(filesLike || []);
+  if (!files.length) return;
+
+  const folder = inferProjectImageFolder(slug);
+  const gallery = ensureProjectGalleryImages(slug);
+  const uploads = IMAGE_OPS.uploads[slug] || [];
+  const deletes = new Set(IMAGE_OPS.deletes[slug] || []);
+
+  for (const file of files) {
+    if (!file.type || !file.type.startsWith('image/')) continue;
+    const filename = normalizeFileName(file.name);
+    const path = `${folder}/${filename}`;
+    const base64 = await fileToBase64(file);
+
+    const existingUploadIdx = uploads.findIndex((u) => u.path === path);
+    const payload = { path, filename, mime: file.type, size: file.size, base64 };
+    if (existingUploadIdx >= 0) uploads[existingUploadIdx] = payload;
+    else uploads.push(payload);
+
+    deletes.delete(path);
+    if (!gallery.includes(path)) gallery.push(path);
+  }
+
+  IMAGE_OPS.uploads[slug] = uploads;
+  IMAGE_OPS.deletes[slug] = Array.from(deletes);
+  markDirty(true);
+  renderProjDetailList();
+}
+
+function removeProjectImage(slug, encodedPath) {
+  const path = decodeURIComponent(encodedPath);
+  const gallery = ensureProjectGalleryImages(slug);
+  DATA.projects_detail[slug].gallery_images = gallery.filter((src) => src !== path);
+
+  const uploads = IMAGE_OPS.uploads[slug] || [];
+  const uploadIdx = uploads.findIndex((u) => u.path === path);
+  if (uploadIdx >= 0) {
+    uploads.splice(uploadIdx, 1);
+    IMAGE_OPS.uploads[slug] = uploads;
+  } else {
+    const deletes = new Set(IMAGE_OPS.deletes[slug] || []);
+    deletes.add(path);
+    IMAGE_OPS.deletes[slug] = Array.from(deletes);
+  }
+
+  markDirty(true);
+  renderProjDetailList();
+}
+
+function renderProjectImageManager(slug) {
+  const folder = inferProjectImageFolder(slug);
+  const images = getProjectGalleryImages(slug);
+  const summary = getImageOpsSummary(slug);
+
+  return `
+    <div class="project-images-manager card" style="margin-top:.75rem">
+      <div class="sec-hd" style="margin-bottom:.7rem;padding-left:0">Project Images Folder</div>
+      <div class="hint" style="margin-bottom:.8rem">Folder: <strong>${esc(folder)}</strong> — Uploads and deletions are applied to the repo on Publish.</div>
+      <div class="proj-img-toolbar">
+        <label class="btn-accent" style="cursor:pointer">
+          + Upload Images
+          <input type="file" accept="image/*" multiple style="display:none" onchange="queueProjectImagesUpload('${slug}', this.files); this.value='';">
+        </label>
+        <div class="hint">Pending: ${summary.uploads} upload(s), ${summary.deletes} delete(s)</div>
+      </div>
+      <div class="proj-img-grid">
+        ${images.length ? images.map((src) => `
+          <div class="proj-img-card">
+            <img src="../${esc(src)}" alt="${esc(src)}" onerror="this.style.opacity=.15;this.style.filter='grayscale(1)'">
+            <div class="proj-img-meta">${esc(src.split('/').pop() || src)}</div>
+            <button class="btn-sm danger" type="button" onclick="removeProjectImage('${slug}','${encodeURIComponent(src)}')">Delete</button>
+          </div>
+        `).join('') : '<div class="hint">No images registered for this project yet.</div>'}
+      </div>
+    </div>
+  `;
+}
+
+async function githubReadContentMeta(cfg, headers, path) {
+  const endpoint = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${toApiPath(path)}?ref=${encodeURIComponent(cfg.branch)}`;
+  const res = await fetch(endpoint, { headers });
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    throw new Error(`Could not read ${path} (${res.status})`);
+  }
+  return res.json();
+}
+
+async function githubUpsertFile(cfg, headers, path, base64, message) {
+  const endpoint = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${toApiPath(path)}`;
+  const current = await githubReadContentMeta(cfg, headers, path);
+  const body = {
+    message,
+    content: base64,
+    branch: cfg.branch
+  };
+  if (current?.sha) body.sha = current.sha;
+  const res = await fetch(endpoint, {
+    method: 'PUT',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `Upload failed for ${path} (${res.status})`);
+  }
+}
+
+async function githubDeleteFile(cfg, headers, path, message) {
+  const current = await githubReadContentMeta(cfg, headers, path);
+  if (!current?.sha) return;
+  const endpoint = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${toApiPath(path)}`;
+  const res = await fetch(endpoint, {
+    method: 'DELETE',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, sha: current.sha, branch: cfg.branch })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `Delete failed for ${path} (${res.status})`);
+  }
+}
+
+function clearImageOps() {
+  Object.keys(IMAGE_OPS.uploads).forEach((k) => { IMAGE_OPS.uploads[k] = []; });
+  Object.keys(IMAGE_OPS.deletes).forEach((k) => { IMAGE_OPS.deletes[k] = []; });
+}
+
+async function syncProjectImageOps(cfg, headers) {
+  const uploads = Object.values(IMAGE_OPS.uploads).flat();
+  const deletes = Object.values(IMAGE_OPS.deletes).flat();
+  if (!uploads.length && !deletes.length) return;
+
+  setStatus(`Syncing images… (${uploads.length} upload, ${deletes.length} delete)`, 'busy');
+
+  for (const path of deletes) {
+    await githubDeleteFile(cfg, headers, path, `Delete image ${path}`);
+  }
+  for (const file of uploads) {
+    await githubUpsertFile(cfg, headers, file.path, file.base64, `Upload image ${file.path}`);
+  }
+}
+
 function setButtonsBusy(isBusy) {
   document.querySelectorAll('.btn-save, .btn-export, .admin-ghost-btn').forEach((btn) => {
     if (btn.classList.contains('btn-home')) return;
@@ -315,6 +608,8 @@ async function publishContentJSON() {
       'Authorization': `Bearer ${cfg.token}`
     };
 
+    await syncProjectImageOps(cfg, headers);
+
     const currentRes = await fetch(`${endpoint}?ref=${encodeURIComponent(cfg.branch)}`, { headers });
     if (!currentRes.ok) {
       throw new Error(`Could not read public/content.json (${currentRes.status})`);
@@ -345,6 +640,7 @@ async function publishContentJSON() {
     const stamp = new Date().toLocaleString('en-US', { hour12: false });
     const saved = { ...cfg, lastPublished: stamp };
     savePublishConfig(saved);
+    clearImageOps();
     const pubLast = document.getElementById('pub-last');
     if (pubLast) pubLast.value = stamp;
     markDirty(false);
@@ -787,6 +1083,8 @@ function renderProjDetailList(){
         <textarea class="ft" style="min-height:80px" oninput="DATA.projects_detail['${slug}'].gallery_images=this.value.split('\\n').filter(Boolean)">${(p.gallery_images||[]).join('\n')}</textarea>
       </div>
     </div>
+    ${renderProjectDetailLinkEditor(slug)}
+    ${renderProjectImageManager(slug)}
   </div>`).join('');
 }
 // Make newly added Project Detail follow the Sweet Kid base structure

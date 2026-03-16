@@ -154,6 +154,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const mod = (n, m) => ((n % m) + m) % m;
 
+    let lastPointerClientX = window.innerWidth / 2;
+    let lastPointerClientY = window.innerHeight / 2;
+
+    root.addEventListener('pointermove', (e) => {
+        lastPointerClientX = e.clientX;
+        lastPointerClientY = e.clientY;
+    }, { passive: true });
+
     rows.forEach(row => {
         const track = row.querySelector('.carousel-track');
         if (!track) return;
@@ -308,10 +316,35 @@ document.addEventListener('DOMContentLoaded', () => {
             lastTime = now;
         }, { passive: true });
 
+        const getClosestCardFromPoint = (clientX, clientY) => {
+            const elementAtPoint = document.elementFromPoint(clientX, clientY);
+            const directCard = elementAtPoint?.closest('.carousel-card');
+            if (directCard && row.contains(directCard)) return directCard;
+
+            const cards = Array.from(row.querySelectorAll('.carousel-card'));
+            if (cards.length === 0) return null;
+
+            let closestCard = null;
+            let closestDistance = Number.POSITIVE_INFINITY;
+
+            cards.forEach((cardEl) => {
+                const rect = cardEl.getBoundingClientRect();
+                const centerX = rect.left + (rect.width / 2);
+                const centerY = rect.top + (rect.height / 2);
+                const distance = Math.hypot(clientX - centerX, clientY - centerY);
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestCard = cardEl;
+                }
+            });
+
+            return closestCard;
+        };
+
         // CARD CLICK (Opens gallery)
         row.addEventListener('click', (e) => {
             if (isSwiping) return;
-            const card = e.target.closest('.carousel-card');
+            const card = e.target.closest('.carousel-card') || getClosestCardFromPoint(lastPointerClientX, lastPointerClientY);
             if (card) {
                 const targetImgIdx = parseInt(card.dataset.idx);
                 openOverlay(targetImgIdx, images);

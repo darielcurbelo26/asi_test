@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-cms="home.meta_title">TATC - Portfolio</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <script src="scripts/cms-engine.js"></script>
+    <script src="scripts/design-system.js"></script>
+</head>
+
+<body class="body_fixed">
+    <!-- PRELOADER -->
+    <div id="loader-wrapper">
+        <div class="loader-text-container" id="loader-text">
+            IN A WORLD OF SAMENESS AND WIDESPREAD INFLUENCE, THROUGH ALL THE CLUTTER (TATC) EXISTS TO HELP PEOPLE UNCOVER WHAT MATTERS TO THEM. WE BELIEVE IN THE POWER OF INDEPENDENT THINKING-TO RESIST WHAT'S EVERYWHERE, EASY, OR EXPECTED.
+        </div>
+        
+        <!-- Cursor Follower for Desktop Loader -->
+        <div id="loader-cursor" class="carousel-cursor-follower" style="opacity: 0;">
+            <div class="cursor-mask">
+                    <span class="cursor-text" data-cms="home.loader_skip_label">SKIP</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="transition-overlay" style="background: black;"></div>
+
+    <nav class="nav_component">
+        <div class="nav_container">
+            <a href="index.html" class="text-style-nav difference-text">
+                <span class="hover-split-text">
+                    <span class="text-inner">TATC</span>
+                    <span class="text-outer">TATC</span>
+                </span>
+            </a>
+            <div class="nav_button difference-text" id="nav_button-menu">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-wrapper">
+        <div class="fixed-controls_component">
+            <div class="icon-button is-cube" title="Toggle Visibility">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="30" y="10" width="60" height="60" fill="none" stroke="currentColor" stroke-width="4" />
+                    <line x1="10" y1="30" x2="30" y2="10" stroke="currentColor" stroke-width="4" />
+                    <line x1="70" y1="30" x2="90" y2="10" stroke="currentColor" stroke-width="4" />
+                    <line x1="70" y1="90" x2="90" y2="70" stroke="currentColor" stroke-width="4" />
+                    <line x1="10" y1="90" x2="30" y2="70" stroke="currentColor" stroke-width="4" />
+                    <rect x="10" y="30" width="60" height="60" fill="none" stroke="currentColor" stroke-width="4" />
+                </svg>
+            </div>
+            <div class="icon-button is-square" title="Toggle Theme"></div>
+        </div>
+
+        <nav class="nav_menu">
+            <div class="nav_container nav_menu-container">
+                <div class="nav_list">
+                    <a href="blog.html" class="text-style-nav nav_link">
+                        <span class="hover-split-text">
+                            <span class="text-inner">The gist</span>
+                            <span class="text-outer">The gist</span>
+                        </span>
+                    </a>
+                    <a href="projects.html" class="text-style-nav nav_link">
+                        <span class="hover-split-text">
+                            <span class="text-inner">Projects</span>
+                            <span class="text-outer">Projects</span>
+                        </span>
+                    </a>
+                    <a href="about.html" class="text-style-nav nav_link">
+                        <span class="hover-split-text">
+                            <span class="text-inner">Info</span>
+                            <span class="text-outer">Info</span>
+                        </span>
+                    </a>
+                </div>
+                <div class="nav_list social_list">
+                    <a href="https://x.com" target="_blank" class="social_link"><img src="assets/social_icons/xx.svg"
+                            alt="xx"></a>
+                    <a href="mailto:ejemplo@correo.com" class="social_link"><img src="assets/social_icons/mail.svg"
+                            alt="mail"></a>
+                    <a href="https://instagram.com" target="_blank" class="social_link"><img
+                            src="assets/social_icons/instagram.svg" alt="instagram"></a>
+                </div>
+            </div>
+        </nav>
+
+        <section class="section_hero">
+            <h1 class="heading-style-h1" style="transform: scale(1.22); position: relative; left: -1%;" data-cms="home.hero_headline">Through all the clutter</h1>
+        </section>
+    </div>
+
+    <div class="cms-cube-wrapper">
+        <div id="cube-container">
+            <div id="cube">
+                <div class="cube-face" id="f1"><img alt=""></div>
+                <div class="cube-face" id="f2"><img alt=""></div>
+                <div class="cube-face" id="f3"><img alt=""></div>
+                <div class="cube-face" id="f4"><img alt=""></div>
+                <div class="cube-face" id="f5"><img alt=""></div>
+                <div class="cube-face" id="f6"><img alt=""></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- GSAP debe cargarse ANTES de script.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="scripts/script.js"></script>
+    <script src="scripts/loader.js"></script>
+</body>
+</html>

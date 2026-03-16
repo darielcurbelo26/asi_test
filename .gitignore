@@ -1,0 +1,24 @@
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Node / tooling
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs / caches
+dist/
+build/
+.cache/
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# OS / temp
+*.swp
+*.swo
+*.tmp

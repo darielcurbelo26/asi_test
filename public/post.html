@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TATC - The Gist</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/post.css">
+    <script src="scripts/cms-engine.js"></script>
+    <script src="scripts/design-system.js"></script>
+</head>
+
+<body class="body_no-fixed">
+    <div class="transition-overlay"></div>
+
+    <!-- Standard TATC Navbar -->
+    <nav class="nav_component">
+        <div class="nav_container">
+            <a href="blog.html" class="text-style-nav difference-text">
+                <span class="hover-split-text">
+                    <span class="text-inner">TATC</span>
+                    <span class="text-outer">TATC</span>
+                </span>
+            </a>
+            <div class="nav_button difference-text" id="nav_button-menu">
+                <div></div><div></div><div></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-wrapper">
+        <div class="fixed-controls_component">
+            <div class="icon-button is-square"></div>
+        </div>
+
+        <nav class="nav_menu">
+            <div class="nav_container nav_menu-container">
+                <div class="nav_list">
+                    <a href="blog.html" class="text-style-nav nav_link">
+                        <span class="hover-split-text"><span class="text-inner">The gist</span><span class="text-outer">The gist</span></span>
+                    </a>
+                    <a href="projects.html" class="text-style-nav nav_link">
+                        <span class="hover-split-text"><span class="text-inner">Projects</span><span class="text-outer">Projects</span></span>
+                    </a>
+                    <a href="about.html" class="text-style-nav nav_link">
+                        <span class="hover-split-text"><span class="text-inner">Info</span><span class="text-outer">Info</span></span>
+                    </a>
+                </div>
+                <div class="nav_list social_list">
+                    <a href="https://x.com" target="_blank" class="social_link"><img src="assets/social_icons/xx.svg" alt="xx"></a>
+                    <a href="mailto:ejemplo@correo.com" class="social_link"><img src="assets/social_icons/mail.svg" alt="mail"></a>
+                    <a href="https://instagram.com" target="_blank" class="social_link"><img src="assets/social_icons/instagram.svg" alt="instagram"></a>
+                </div>
+            </div>
+        </nav>
+
+        <main class="post_wrapper">
+            <aside class="post_sidebar">
+                <a href="blog.html" class="text-style-label post_sidebar-link">← Archive</a>
+                <div class="sidebar_meta">
+                    <span class="text-style-label post_sidebar-meta-label">Date</span>
+                    <span class="text-style-label" id="post-date">—</span>
+                </div>
+                <div class="sidebar_meta">
+                    <span class="text-style-label post_sidebar-meta-label">Subject</span>
+                    <span class="text-style-label" id="post-subject">—</span>
+                </div>
+            </aside>
+
+            <div class="post_main-content">
+                <header class="post_title-block">
+                    <h1 class="post_editorial-title" id="post-title">Loading...</h1>
+                </header>
+
+                <article class="post_article-body" id="post-body"></article>
+
+                <footer class="post_footer-nav">
+                    <span class="text-style-label post_footer-label" id="post-footer-label">TATC — THE GIST</span>
+                    <span class="text-style-label" id="post-footer-credit">ISEEASI — 2026</span>
+                </footer>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="scripts/script.js"></script>
+    <script src="scripts/post.js"></script>
+</body>
+</html>

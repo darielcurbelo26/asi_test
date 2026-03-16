@@ -103,8 +103,8 @@
             const isUnlocked = sessionStorage.getItem('tatc-unlocked') === 'true';
 
             if (visibility === 'private' && !isUnlocked) {
-                // Redirect to gateway with return page info
-                window.location.href = `password.html?redirect=${page}`;
+                // Password page is deprecated: send locked pages to home directly.
+                window.location.replace('index.html');
             }
         } catch (e) {
             console.warn("Security check failed:", e);

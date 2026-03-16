@@ -1395,6 +1395,28 @@ body.dark-mode .not-found-ui-layer {
     font-weight: bold;
 }
 
+/* About page values should remain static and never flicker */
+.about-page .about-value-title {
+    font-family: "Inter Variable", sans-serif;
+    font-weight: 700;
+    color: var(--text-color);
+    transition: none;
+    animation: none;
+}
+
+/* A Sweet Kid project description links are intentionally red */
+.a-sweet-kid-page .text-size-regular .bold-link,
+.a-sweet-kid-page .text-size-regular .bold-link .text-inner,
+.a-sweet-kid-page .text-size-regular .bold-link .text-outer {
+    color: #d40000;
+}
+
+.a-sweet-kid-page .text-size-regular .bold-link:hover,
+.a-sweet-kid-page .text-size-regular .bold-link:hover .text-inner,
+.a-sweet-kid-page .text-size-regular .bold-link:hover .text-outer {
+    color: #b30000;
+}
+
 /* Effect to 'separate' or change the font for the hover state */
 .alternate-font .text-inner,
 .alternate-font .text-outer {

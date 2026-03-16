@@ -100,7 +100,7 @@ body.focus-mode #hint{opacity:0}
 @keyframes ab{to{height:12px}}
 
 #hud-br{
-  position:fixed;bottom:2.5rem;left:50%;transform:translateX(-50%);z-index:200;
+  position:fixed;bottom:2.5rem;right:2.5rem;z-index:200;
   font-family:'IBM Plex Mono', monospace;
   font-size:12px;letter-spacing:0.32em;text-transform:uppercase;color:rgba(250,250,250,.38);
   pointer-events:none;line-height:1.2;text-shadow:0 8px 24px rgba(0,0,0,.4)
@@ -112,26 +112,25 @@ body.focus-mode #hint{opacity:0}
   text-align:center;pointer-events:none;z-index:200;
   opacity:0;transition:opacity .7s;white-space:normal;line-height:1.35;
   min-width:260px;max-width:480px;
-  background:transparent;
-  border:none;
+  background:rgba(250,250,250,.9);
+  border:1px solid rgba(5,5,5,.1);
   border-radius:0;
-  padding:0;
-  box-shadow:none;
-  backdrop-filter:none;
+  padding:.55rem .85rem;
+  box-shadow:0 14px 32px rgba(0,0,0,.28);
+  backdrop-filter:blur(3px);
   display:flex;flex-direction:column;gap:.35rem;align-items:center
 }
 #caption.on{opacity:1}
 .cap-title{
   font-family:'IBM Plex Mono', monospace;
   font-size:12px;letter-spacing:0.38em;font-weight:400;
-  text-transform:uppercase;color:rgba(250,250,250,.78)
+  text-transform:uppercase;color:rgba(5,5,5,.9)
 }
 .cap-sub{
   font-family:'IBM Plex Mono', monospace;
-  font-size:11px;letter-spacing:0.22em;color:rgba(250,250,250,.5);
+  font-size:11px;letter-spacing:0.16em;color:rgba(0,0,0,.82);
   margin-top:.2rem;text-transform:uppercase
 }
-body.focus-mode #caption,
 body.focus-mode #focus-bar {
   background:transparent;
   border-color:transparent;
@@ -181,7 +180,7 @@ body.focus-mode #focus-bar {
     max-width:calc(100vw - 2.2rem);
     padding:0;
   }
-  #hud-br { bottom:1.1rem; left:50%; transform:translateX(-50%); font-size:10px; letter-spacing:0.26em }
+  #hud-br { right:1.1rem; left:auto; transform:none; font-size:10px; letter-spacing:0.24em }
   #audio-viz {
     bottom:1.1rem; left:1.1rem;
     padding:0;
@@ -203,7 +202,7 @@ body.focus-mode #focus-bar {
     bottom:1.1rem;
     max-width:calc(100vw - 2.2rem);
     border-radius:0;
-    padding:0;
+    padding:.55rem .75rem;
   }
   .cap-title { font-size:10px; letter-spacing:0.32em }
   .cap-sub { font-size:10px }
@@ -218,7 +217,7 @@ body.focus-mode #focus-bar {
     white-space:normal;
   }
   body.focus-mode #focus-bar { background:transparent; }
-  body.focus-mode #caption { background:transparent; }
+  body.focus-mode #caption { background:rgba(250,250,250,.9); border-color:rgba(5,5,5,.1); }
   #cursor { display:none }
 }
 @media (max-width:400px) {

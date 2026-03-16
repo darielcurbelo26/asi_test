@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Hidden by default to avoid flash, but managed by to()
-    gsap.set('.nav_component, .heading-style-h1, .section_hero-title-password, .not-found-title, .fixed-controls_component > *, .nav_list a, .text-size-regular, .text-style-label, .not-found-sub, .password-form', {
+    gsap.set('.nav_component, .heading-style-h1, .section_hero-title-password, .not-found-title, .fixed-controls_component > *, .text-size-regular, .text-style-label, .not-found-sub, .password-form', {
         opacity: 0
     });
 

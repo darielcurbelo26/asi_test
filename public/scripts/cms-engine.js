@@ -16,9 +16,24 @@
 
   function inject(el, value) {
     const attr = el.getAttribute('data-cms-attr');
-    if (attr)                   el.setAttribute(attr, value);
-    else if (el.tagName==='TITLE') document.title = value;
-    else                        el.innerHTML = value;
+    const mode = (el.getAttribute('data-cms-mode') || '').toLowerCase();
+    const allowHtml = el.hasAttribute('data-cms-html') || mode === 'html';
+
+    if (attr) {
+      // Basic URL hardening: never allow javascript: URLs.
+      if ((attr === 'href' || attr === 'src') && /^\s*javascript:/i.test(value)) return;
+      el.setAttribute(attr, value);
+      return;
+    }
+
+    if (el.tagName === 'TITLE') {
+      document.title = value;
+      return;
+    }
+
+    // Safe-by-default: treat CMS values as text unless explicitly opted into HTML.
+    if (allowHtml) el.innerHTML = value;
+    else el.textContent = value;
   }
 
   function hydrate(data) {
@@ -42,7 +57,8 @@
 
     // 2 — Merge/fallback with content.json
     try {
-      const res = await fetch('content.json?t=' + Date.now());
+      // Prefer revalidation over hard cache-busting (better caching + fewer bytes).
+      const res = await fetch('content.json', { cache: 'no-cache' });
       if (res.ok) {
         const fresh = await res.json();
         // If no draft, use fresh. If draft exists, use draft but fill missing top-level keys from fresh.

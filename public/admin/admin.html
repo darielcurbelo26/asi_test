@@ -184,7 +184,7 @@ function buildNav() {
   let html = '';
   NAV.forEach(n => {
     if (n.cat) html += `<div class="sb-cat">${n.cat}</div>`;
-    const viewBtn = n.view ? `<a class="sb-view" href="${n.view}" target="_blank" title="View page">↗</a>` : '';
+    const viewBtn = n.view ? `<a class="sb-view" href="${n.view}" target="_blank" rel="noopener noreferrer" title="View page">↗</a>` : '';
     html += `<div class="sb-item" data-id="${n.id}" onclick="renderPanel('${n.id}')"><span class="sb-item-lbl">${n.icon}&nbsp;${n.label}</span>${viewBtn}</div>`;
   });
   nav.innerHTML = html;

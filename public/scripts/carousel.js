@@ -62,14 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const mask = follower.querySelector('.cursor-mask');
         const innerText = follower.querySelector('.cursor-text');
 
-        window.addEventListener('mousemove', (e) => {
-            gsap.to(follower, {
-                x: e.clientX,
-                y: e.clientY,
-                duration: 0.15,
-                ease: "power2.out"
-            });
-        });
+        const xTo = gsap.quickTo(follower, 'x', { duration: 0.15, ease: 'power2.out' });
+        const yTo = gsap.quickTo(follower, 'y', { duration: 0.15, ease: 'power2.out' });
+        window.addEventListener('pointermove', (e) => {
+            xTo(e.clientX);
+            yTo(e.clientY);
+        }, { passive: true });
 
         // ANIMACIÓN DE ENTRADA
         root.addEventListener('mouseenter', () => {
@@ -116,7 +114,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentImages || currentImages.length === 0) return;
         if (currentIndex < 0) currentIndex = currentImages.length - 1;
         if (currentIndex >= currentImages.length) currentIndex = 0;
-        if (overlayImg) overlayImg.src = currentImages[currentIndex];
+        if (overlayImg) {
+            overlayImg.decoding = 'async';
+            overlayImg.src = currentImages[currentIndex];
+        }
     };
 
     const openOverlay = (index, imagesArray) => {
@@ -151,6 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const rows = root.querySelectorAll('.carousel-container');
     const AUTOPLAY_SPEED = 0.5;
 
+    const mod = (n, m) => ((n % m) + m) % m;
+
     rows.forEach(row => {
         const track = row.querySelector('.carousel-track');
         if (!track) return;
@@ -159,62 +162,119 @@ document.addEventListener('DOMContentLoaded', () => {
         // Shuffle propio por fila — orden y punto de inicio distintos
         const images = buildShuffledImages();
 
-        // Creación nativa del DOM para las tarjetas (sin innerHTML)
-        for (let i = 0; i < 4; i++) {
-            images.forEach((src, idx) => {
-                const slide = document.createElement('div');
-                slide.className = 'carousel-slide';
+        // Virtualización: renderiza solo las tarjetas necesarias para cubrir el viewport
+        // y recicla los nodos para crear el efecto infinito (mucho menos DOM/requests).
+        const gap = parseFloat(window.getComputedStyle(track).gap) || 0;
+        const cardHeight = parseFloat(
+            window.getComputedStyle(document.documentElement).getPropertyValue('--card-height')
+        ) || 160;
+        const estimatedSpan = Math.max(120, cardHeight * 1.4) + gap;
+        const slideCount = Math.min(
+            140,
+            Math.max(24, Math.ceil((row.clientWidth || window.innerWidth) / estimatedSpan) + 14)
+        );
 
-                const card = document.createElement('div');
-                card.className = 'carousel-card';
-                card.dataset.idx = idx;
+        let headLogicalIndex = Math.floor(Math.random() * images.length);
+        let tailLogicalIndex = headLogicalIndex + slideCount - 1;
 
-                const img = document.createElement('img');
-                img.src = src;
-                img.className = 'carousel-image';
-                img.draggable = false;
-
-                card.appendChild(img);
-                slide.appendChild(card);
-                track.appendChild(slide);
-            });
+        function setSlideToLogicalIndex(slideEl, logicalIndex) {
+            const idx = mod(logicalIndex, images.length);
+            const card = slideEl.firstElementChild;
+            if (card) card.dataset.idx = String(idx);
+            const img = slideEl.querySelector('img');
+            if (img) {
+                const nextSrc = images[idx];
+                if (img.getAttribute('src') !== nextSrc) img.src = nextSrc;
+            }
         }
 
-        let setWidth = 0;
+        function createSlide(logicalIndex) {
+            const slide = document.createElement('div');
+            slide.className = 'carousel-slide';
+
+            const card = document.createElement('div');
+            card.className = 'carousel-card';
+
+            const img = document.createElement('img');
+            img.className = 'carousel-image';
+            img.draggable = false;
+            img.loading = 'lazy';
+            img.decoding = 'async';
+
+            card.appendChild(img);
+            slide.appendChild(card);
+            setSlideToLogicalIndex(slide, logicalIndex);
+            return slide;
+        }
+
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < slideCount; i++) {
+            frag.appendChild(createSlide(headLogicalIndex + i));
+        }
+        track.replaceChildren(frag);
+
+        let currentX = 0;
         let velocity = 0;
         let isSwiping = false;
         let startX = 0, lastX = 0, lastTime = 0;
 
-        function calculateDimensions() {
-            const slides = track.querySelectorAll('.carousel-slide');
-            if (slides.length === 0) return 0;
-            let totalWidth = 0;
-            const gap = parseFloat(window.getComputedStyle(track).gap) || 0;
-            for (let i = 0; i < images.length; i++) {
-                totalWidth += slides[i].offsetWidth + gap;
-            }
-            return totalWidth;
-        }
+        const getSlideSpan = (slideEl) => {
+            if (!slideEl) return estimatedSpan;
+            const w = slideEl.offsetWidth;
+            return (w || (estimatedSpan - gap)) + gap;
+        };
 
         function setup() {
-            setWidth = calculateDimensions();
-            if (setWidth > 0) gsap.set(track, { x: -setWidth });
+            // Mantiene el carrusel “llenando” el ancho en resizes.
+            // Si la pantalla crece, añade algunos slides extra.
+            const desired = Math.min(
+                180,
+                Math.max(24, Math.ceil((row.clientWidth || window.innerWidth) / estimatedSpan) + 14)
+            );
+            const current = track.children.length;
+            if (current < desired) {
+                const addFrag = document.createDocumentFragment();
+                for (let i = 0; i < desired - current; i++) {
+                    tailLogicalIndex += 1;
+                    addFrag.appendChild(createSlide(tailLogicalIndex));
+                }
+                track.appendChild(addFrag);
+            }
         }
-        setTimeout(setup, 200);
+        setTimeout(setup, 0);
+
+        // Recycle helper: keeps currentX within [-span(first), 0]
+        function recycle() {
+            // Move first -> end when drifting left too far
+            while (track.firstElementChild && currentX <= -getSlideSpan(track.firstElementChild)) {
+                const first = track.firstElementChild;
+                const span = getSlideSpan(first);
+                currentX += span;
+                headLogicalIndex += 1;
+                tailLogicalIndex += 1;
+                track.appendChild(first);
+                setSlideToLogicalIndex(first, tailLogicalIndex);
+            }
+
+            // Move last -> front when drifting right (positive x)
+            while (track.lastElementChild && currentX >= 0) {
+                const last = track.lastElementChild;
+                const span = getSlideSpan(last);
+                currentX -= span;
+                headLogicalIndex -= 1;
+                tailLogicalIndex -= 1;
+                track.insertBefore(last, track.firstElementChild);
+                setSlideToLogicalIndex(last, headLogicalIndex);
+            }
+        }
 
         function animate() {
-            if (setWidth === 0) return requestAnimationFrame(animate);
-
-            let currentX = gsap.getProperty(track, 'x');
             // La dirección base del autoplay más la aceleración por gestos
             currentX -= (AUTOPLAY_SPEED * direction) - velocity;
             // Fricción constante
             velocity *= 0.95;
 
-            // Efecto infinito
-            if (currentX < -setWidth * 2.5) currentX += setWidth;
-            else if (currentX > -setWidth * 0.5) currentX -= setWidth;
-
+            recycle();
             gsap.set(track, { x: currentX });
             requestAnimationFrame(animate);
         }

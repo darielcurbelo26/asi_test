@@ -156,6 +156,32 @@ const DesignSystem = {
         this.initThemeBeforeRender();
         this.syncStorageChanges();
         this.watchSystemScheme();
+        this.hardenLinks();
+    },
+
+    hardenLinks() {
+        const apply = () => {
+            document.querySelectorAll('a[target="_blank"]').forEach((a) => {
+                const rel = (a.getAttribute('rel') || '').toLowerCase();
+                const needsNoopener = !rel.includes('noopener');
+                const needsNoreferrer = !rel.includes('noreferrer');
+                if (needsNoopener || needsNoreferrer) {
+                    const next = (rel ? rel.split(/\s+/).filter(Boolean) : []);
+                    if (needsNoopener) next.push('noopener');
+                    if (needsNoreferrer) next.push('noreferrer');
+                    a.setAttribute('rel', Array.from(new Set(next)).join(' '));
+                }
+            });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', apply, { once: true });
+        } else {
+            apply();
+        }
+
+        // Also re-apply after CMS hydration / dynamic content.
+        document.addEventListener('cms:ready', apply, { once: true });
     },
 
     watchSystemScheme() {

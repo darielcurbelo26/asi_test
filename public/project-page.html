@@ -3,9 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; connect-src 'self'; frame-src 'self';">
   <title data-cms-project="meta_title">Project — TATC</title>
   <link rel="stylesheet" href="styles/style.css">
-  <script src="scripts/cms-engine.js"></script>
+  <script src="scripts/cms-engine.js" defer></script>
   <script src="scripts/design-system.js"></script>
   <style>
     /* Extra spacing/layout for project template */

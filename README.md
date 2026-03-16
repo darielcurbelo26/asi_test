@@ -1,45 +1,42 @@
-# ASI TEST Copilot Vainilla
+# TATC — Portfolio (sitio estático)
 
-Este es el sitio web de TATC Portfolio.
+Sitio web estático (HTML/CSS/JS) para el portfolio de TATC/ISEEASI.
 
-## Cómo subir a GitHub
+Incluye:
+- Theme switch (claro/oscuro) con transición “simple dissolve”.
+- CMS ligero basado en [public/content.json](public/content.json) con “draft” opcional desde el panel admin (localStorage).
+- Páginas: Home, Projects, Project Page (template), Blog/Post, Info/About, Artist, y experiencias (incluye una experiencia 3D).
 
-1. **Crear un repositorio en GitHub:**
-   - Ve a [GitHub.com](https://github.com) y crea una nueva cuenta si no tienes una.
-   - Haz clic en "New repository".
-   - Nómbralo algo como "tatc-portfolio".
-   - Elige público o privado según prefieras.
-   - No inicialices con README, .gitignore o license, ya que ya tienes archivos.
+## Estructura
 
-2. **Inicializar Git en tu proyecto local:**
-   - Abre una terminal en la carpeta del proyecto: `/Users/darielcurbelo/Desktop/ASI TEST Copilot Vainilla`
-   - Ejecuta: `git init`
+- El sitio “publicable” está en la carpeta [public/](public/)
+- Contenido editable: [public/content.json](public/content.json)
+- Admin (edición local + export JSON): [public/admin/admin.html](public/admin/admin.html)
 
-3. **Agregar archivos al repositorio:**
-   - `git add .`
-   - `git commit -m "Initial commit"`
+## Desarrollo local
 
-4. **Conectar con GitHub:**
-   - Copia la URL de tu repositorio (ej: https://github.com/tuusuario/tatc-portfolio.git)
-   - Ejecuta: `git remote add origin https://github.com/tuusuario/tatc-portfolio.git`
-   - `git push -u origin main`
+Servidor estático (recomendado):
 
-5. **Trabajar desde GitHub:**
-   - Para futuras actualizaciones, haz cambios locales, luego `git add .`, `git commit -m "mensaje"`, `git push`.
-   - Si trabajas desde VS Code con GitHub, puedes usar la extensión Git para commits y pushes.
+`cd public && python3 -m http.server 8000`
 
-## Estructura del proyecto
+Luego abre `http://localhost:8000`.
 
-- `index.html`: Página principal
-- `style.css`: Estilos globales
-- `script.js`: Lógica JavaScript
-- `design-system.js`: Sistema de diseño y tema
-- `content.json`: Contenido CMS
-- `assets/`: Imágenes y recursos
-- `projects/`: Páginas de proyectos individuales
+## Publicación (GitHub Pages)
 
-## Notas
+Este repo incluye despliegue automático con GitHub Actions:
+- Workflow: [.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml)
+- `.nojekyll` incluido para que GitHub Pages no ignore archivos con prefijo `_`.
 
-- El sitio usa un sistema de temas (claro/oscuro) guardado en localStorage.
-- Páginas privadas requieren contraseña, definida en `content.json`.
-- Interacciones optimizadas para mobile.
+Pasos (una sola vez en GitHub):
+1. En el repo: **Settings → Pages**
+2. En “Build and deployment”, selecciona **Source: GitHub Actions**
+
+Cada `git push` a `main` publicará el contenido de [public/](public/).
+
+## Seguridad (hardening básico)
+
+- CSP/Permissions-Policy/Referrer-Policy añadidos como meta tags en páginas principales.
+- Enlaces `target="_blank"` forzados a `rel="noopener noreferrer"`.
+- Renderizado CMS seguro por defecto (usa `textContent` salvo opt-in de HTML).
+
+Nota: al ser un sitio estático, el “admin” no es un backend con auth real; evita publicar datos sensibles en el panel.

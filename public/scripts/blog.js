@@ -4,24 +4,49 @@
         const list = document.getElementById('blog-list');
         if (!list || !data || !data.blog || !data.blog.posts) return;
 
-        list.innerHTML = data.blog.posts.map(post => `
-            <a href="${post.url}" class="blog_entry">
-                <div class="blog_entry-meta">${post.date}</div>
-                <div class="blog_entry-content">
-                    <h2 class="blog_entry-title">${post.title}</h2>
-                    <p class="text-size-regular">${post.summary}</p>
-                </div>
-            </a>
-        `).join('');
+        list.textContent = '';
+        const frag = document.createDocumentFragment();
 
-        // Wire page transitions for dynamically created links
-        list.querySelectorAll('a.blog_entry').forEach(link => {
+        data.blog.posts.forEach(post => {
+            const link = document.createElement('a');
+            link.className = 'blog_entry';
+
+            const url = String(post.url || '');
+            if (/^\s*javascript:/i.test(url)) return;
+            link.href = url;
+
+            const meta = document.createElement('div');
+            meta.className = 'blog_entry-meta';
+            meta.textContent = post.date || '';
+
+            const content = document.createElement('div');
+            content.className = 'blog_entry-content';
+
+            const title = document.createElement('h2');
+            title.className = 'blog_entry-title';
+            title.textContent = post.title || '';
+
+            const summary = document.createElement('p');
+            summary.className = 'text-size-regular';
+            summary.textContent = post.summary || '';
+
+            content.appendChild(title);
+            content.appendChild(summary);
+
+            link.appendChild(meta);
+            link.appendChild(content);
+
+            // Wire page transitions for dynamically created links
             link.addEventListener('click', e => {
                 if (window.canviaPagina) {
                     e.preventDefault();
                     window.canviaPagina(e);
                 }
             });
+
+            frag.appendChild(link);
         });
+
+        list.appendChild(frag);
     });
 })();

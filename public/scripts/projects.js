@@ -161,25 +161,63 @@
             var div = document.createElement('div');
             div.className = 'proj-slide' + (project.link ? ' has-link' : '');
 
-            var mediaHtml = '';
+            // Media
             if (project.iframe) {
-                mediaHtml = '<iframe src="' + project.iframe + '" style="width:100%;height:100%;border:none;pointer-events:none;" loading="lazy"></iframe>';
+                var iframe = document.createElement('iframe');
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
+                iframe.style.pointerEvents = 'none';
+                iframe.loading = 'lazy';
+                var iframeSrc = String(project.iframe || '');
+                if (!/^\s*javascript:/i.test(iframeSrc)) iframe.src = iframeSrc;
+                div.appendChild(iframe);
             } else if (project.src) {
-                mediaHtml = '<img src="' + project.src + '" alt="' + project.title + '">';
+                var img = document.createElement('img');
+                img.loading = 'lazy';
+                img.decoding = 'async';
+                img.alt = project.title || '';
+                var imgSrc = String(project.src || '');
+                if (!/^\s*javascript:/i.test(imgSrc)) img.src = imgSrc;
+                div.appendChild(img);
             } else {
-                mediaHtml = '<div class="proj-placeholder">Coming soon</div>';
+                var ph = document.createElement('div');
+                ph.className = 'proj-placeholder';
+                ph.textContent = 'Coming soon';
+                div.appendChild(ph);
             }
 
-            div.innerHTML =
-                mediaHtml +
-                '<div class="proj-info">' +
-                '<div class="proj-title">' + project.title + '</div>' +
-                '<div class="proj-meta">' +
-                (project.desc ? '<div>DESCRIPTION: ' + project.desc + '</div>' : '') +
-                (project.loc ? '<div>LOCATION: ' + project.loc + '</div>' : '') +
-                (project.date ? '<div>DATE: ' + project.date + '</div>' : '') +
-                '</div>' +
-                '</div>';
+            // Info
+            var info = document.createElement('div');
+            info.className = 'proj-info';
+
+            var title = document.createElement('div');
+            title.className = 'proj-title';
+            title.textContent = project.title || '';
+            info.appendChild(title);
+
+            var meta = document.createElement('div');
+            meta.className = 'proj-meta';
+
+            if (project.desc) {
+                var d = document.createElement('div');
+                d.textContent = 'DESCRIPTION: ' + project.desc;
+                meta.appendChild(d);
+            }
+            if (project.loc) {
+                var l = document.createElement('div');
+                l.textContent = 'LOCATION: ' + project.loc;
+                meta.appendChild(l);
+            }
+            if (project.date) {
+                var dt = document.createElement('div');
+                dt.textContent = 'DATE: ' + project.date;
+                meta.appendChild(dt);
+            }
+
+            info.appendChild(meta);
+            div.appendChild(info);
+
             wrapper.appendChild(div);
             state.slides.push(div);
         });

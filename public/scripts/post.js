@@ -14,21 +14,51 @@
         document.getElementById('post-footer-credit').textContent = post.footer_credit;
 
         const body = document.getElementById('post-body');
-        body.innerHTML = post.body.map(block => {
+        body.textContent = '';
+        const frag = document.createDocumentFragment();
+
+        (Array.isArray(post.body) ? post.body : []).forEach(block => {
+            if (!block || !block.type) return;
+
             if (block.type === 'paragraph') {
-                return `<p class="text-size-regular">${block.text}</p>`;
+                const p = document.createElement('p');
+                p.className = 'text-size-regular';
+                p.textContent = block.text || '';
+                frag.appendChild(p);
+                return;
             }
+
             if (block.type === 'image') {
-                return `
-                    <div class="post_block">
-                        <img src="${block.src}" class="post_image-editorial" alt="${block.alt}" loading="lazy" decoding="async">
-                        <span class="text-style-label post_caption">${block.caption}</span>
-                    </div>`;
+                const wrap = document.createElement('div');
+                wrap.className = 'post_block';
+
+                const img = document.createElement('img');
+                img.className = 'post_image-editorial';
+                img.loading = 'lazy';
+                img.decoding = 'async';
+                img.alt = block.alt || '';
+                const src = String(block.src || '');
+                if (!/^\s*javascript:/i.test(src)) img.src = src;
+
+                const cap = document.createElement('span');
+                cap.className = 'text-style-label post_caption';
+                cap.textContent = block.caption || '';
+
+                wrap.appendChild(img);
+                wrap.appendChild(cap);
+                frag.appendChild(wrap);
+                return;
             }
+
             if (block.type === 'pullquote') {
-                return `<div class="post_pull-quote">${block.text}</div>`;
+                const q = document.createElement('div');
+                q.className = 'post_pull-quote';
+                q.textContent = block.text || '';
+                frag.appendChild(q);
+                return;
             }
-            return '';
-        }).join('');
+        });
+
+        body.appendChild(frag);
     });
 })();

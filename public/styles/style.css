@@ -170,6 +170,11 @@ body.theme-switching .nav_component .difference-text div {
     mix-blend-mode: normal !important;
 }
 
+.project-page-template .nav_component,
+.project-page-a-sweet-kid .nav_component {
+    mix-blend-mode: normal !important;
+}
+
 .projects-page .nav_component .text-style-nav,
 .projects-page .nav_component .text-style-nav *,
 .projects-page .nav_component .difference-text {
@@ -179,8 +184,26 @@ body.theme-switching .nav_component .difference-text div {
     background-color: transparent !important;
 }
 
+.project-page-template .nav_component .text-style-nav,
+.project-page-template .nav_component .text-style-nav *,
+.project-page-template .nav_component .difference-text,
+.project-page-a-sweet-kid .nav_component .text-style-nav,
+.project-page-a-sweet-kid .nav_component .text-style-nav *,
+.project-page-a-sweet-kid .nav_component .difference-text {
+    color: var(--text-color) !important;
+    mix-blend-mode: normal !important;
+    background: none !important;
+    background-color: transparent !important;
+}
+
 .projects-page .nav_component .nav_button div {
     background-color: #ffffff !important;
+    mix-blend-mode: normal !important;
+}
+
+.project-page-template .nav_component .nav_button div,
+.project-page-a-sweet-kid .nav_component .nav_button div {
+    background-color: var(--text-color) !important;
     mix-blend-mode: normal !important;
 }
 

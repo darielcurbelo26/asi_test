@@ -194,26 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
         entranceTimeline.play();
     }
 
-    // Check loader state more aggressively to prevent delays
-    const loaderExists = document.getElementById('loader-wrapper') || document.getElementById('loader');
-    const isLoaded = sessionStorage.getItem('tatc-loaded');
-
-    if (isLoaded || !loaderExists) {
-        // No loader needed or already done -> play immediately
-        playEntrance();
-    } else {
-        // Wait for loader, but if it's already dispatching, catch it
-        entranceTimeline.pause(); // Pause because we know loader is active
-        document.addEventListener('tatc:loaderDone', () => {
-            playEntrance();
-        });
-        
-        // Safety: If loader takes too long or event missed
-        setTimeout(() => {
-             if (entranceTimeline.progress() === 0) playEntrance();
-        }, 12000);
-    }
-
     // Hidden by default to avoid flash, but managed by to()
     gsap.set('.nav_component, .heading-style-h1, .section_hero-title-password, .not-found-title, .fixed-controls_component > *, .nav_list a, .text-size-regular, .text-style-label, .not-found-sub, .password-form', {
         opacity: 0
@@ -321,6 +301,27 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: 2,
             ease: 'power2.out'
         }, 0.6);
+    }
+
+    // Check loader state after timeline steps are fully configured.
+    // Otherwise playEntrance() can run on an empty timeline and never reveal hidden elements.
+    const loaderExists = document.getElementById('loader-wrapper') || document.getElementById('loader');
+    const isLoaded = sessionStorage.getItem('tatc-loaded');
+
+    if (isLoaded || !loaderExists) {
+        // No loader needed or already done -> play immediately
+        playEntrance();
+    } else {
+        // Wait for loader, but if it's already dispatching, catch it
+        entranceTimeline.pause(); // Pause because we know loader is active
+        document.addEventListener('tatc:loaderDone', () => {
+            playEntrance();
+        });
+
+        // Safety: If loader takes too long or event missed
+        setTimeout(() => {
+            if (entranceTimeline.progress() === 0) playEntrance();
+        }, 12000);
     }
 
     // --- 1. BURGER MENU ---

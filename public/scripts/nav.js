@@ -8,12 +8,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function applyCmsValue(el, value) {
         const attr = el.getAttribute('data-cms-attr');
+        const asText = String(value);
+        const isEmpty = asText.trim().length === 0;
+
+        // Never overwrite fallback content with empty CMS values.
+        if (isEmpty) return;
+
         if (attr) {
-            if ((attr === 'href' || attr === 'src') && /^\s*javascript:/i.test(String(value))) return;
-            el.setAttribute(attr, String(value));
+            if ((attr === 'href' || attr === 'src') && /^\s*javascript:/i.test(asText)) return;
+            el.setAttribute(attr, asText);
             return;
         }
-        el.textContent = String(value);
+        el.textContent = asText;
     }
 
     function hydrateScope(scope, data) {

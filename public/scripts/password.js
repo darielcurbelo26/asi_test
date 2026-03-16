@@ -10,6 +10,12 @@
     let correctPassword = '';
     const redirectPage = new URLSearchParams(window.location.search).get('redirect') || 'index.html';
 
+    try {
+        pInput.focus({ preventScroll: true });
+    } catch (e) {
+        // ignore
+    }
+
     async function loadGateContent() {
         try {
             let data = window.TATC_CONTENT;
@@ -22,7 +28,8 @@
             }
 
             if (!data) {
-                const r = await fetch('content.json?t=' + Date.now());
+                const r = await fetch('content.json', { cache: 'no-cache' });
+                if (!r.ok) throw new Error('content.json load failed');
                 data = await r.json();
             }
 
@@ -73,11 +80,26 @@
     const eClosed = document.getElementById('eClosed');
 
     if (tPass && eOpen && eClosed) {
+        const setRevealState = (reveal) => {
+            pInput.type = reveal ? 'text' : 'password';
+            eOpen.style.display = reveal ? 'none' : 'block';
+            eClosed.style.display = reveal ? 'block' : 'none';
+            tPass.setAttribute('aria-pressed', reveal ? 'true' : 'false');
+            tPass.setAttribute('aria-label', reveal ? 'Hide password' : 'Show password');
+        };
+
+        setRevealState(false);
+
         tPass.addEventListener('click', () => {
-            const isPassword = pInput.type === 'password';
-            pInput.type = isPassword ? 'text' : 'password';
-            eOpen.style.display = isPassword ? 'none' : 'block';
-            eClosed.style.display = isPassword ? 'block' : 'none';
+            const reveal = pInput.type === 'password';
+            setRevealState(reveal);
+        });
+
+        tPass.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                tPass.click();
+            }
         });
     }
 })();

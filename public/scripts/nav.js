@@ -1,5 +1,42 @@
 // nav.js - Modular navigation component
 document.addEventListener('DOMContentLoaded', () => {
+    function getByPath(obj, path) {
+        return String(path || '')
+            .split('.')
+            .reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj);
+    }
+
+    function applyCmsValue(el, value) {
+        const attr = el.getAttribute('data-cms-attr');
+        if (attr) {
+            if ((attr === 'href' || attr === 'src') && /^\s*javascript:/i.test(String(value))) return;
+            el.setAttribute(attr, String(value));
+            return;
+        }
+        el.textContent = String(value);
+    }
+
+    function hydrateScope(scope, data) {
+        if (!scope || !data) return;
+        scope.querySelectorAll('[data-cms]').forEach((el) => {
+            const path = el.getAttribute('data-cms');
+            const value = getByPath(data, path);
+            if (value === undefined || value === null || typeof value === 'object') return;
+            applyCmsValue(el, value);
+        });
+    }
+
+    function resolveContent() {
+        if (window.TATC_CONTENT && typeof window.TATC_CONTENT === 'object') return window.TATC_CONTENT;
+        try {
+            const draft = localStorage.getItem('tatc_cms');
+            if (draft) return JSON.parse(draft);
+        } catch {
+            return null;
+        }
+        return null;
+    }
+
     const navHTML = `
         <nav class="nav_component">
             <div class="nav_container">
@@ -53,4 +90,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Insert at the beginning of body.
     document.body.insertAdjacentHTML('afterbegin', navHTML);
+
+    const scopes = document.querySelectorAll('.nav_component, .nav_menu');
+    const initialData = resolveContent();
+    scopes.forEach((scope) => hydrateScope(scope, initialData));
+
+    // Rehydrate when CMS finishes loading after nav insertion.
+    document.addEventListener('cms:ready', (event) => {
+        const data = event && event.detail ? event.detail : resolveContent();
+        scopes.forEach((scope) => hydrateScope(scope, data));
+    });
 });

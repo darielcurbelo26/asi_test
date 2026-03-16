@@ -1404,16 +1404,15 @@ body.dark-mode .not-found-ui-layer {
     animation: none;
 }
 
-/* A Sweet Kid project description links are intentionally red */
-.a-sweet-kid-page .text-size-regular .bold-link,
-.a-sweet-kid-page .text-size-regular .bold-link .text-inner,
-.a-sweet-kid-page .text-size-regular .bold-link .text-outer {
+/* Salon Silicon link on the A Sweet Kid page is red */
+.a-sweet-kid-page .salon-link,
+.a-sweet-kid-page .salon-link .text-inner,
+.a-sweet-kid-page .salon-link .text-outer {
     color: #d40000;
 }
-
-.a-sweet-kid-page .text-size-regular .bold-link:hover,
-.a-sweet-kid-page .text-size-regular .bold-link:hover .text-inner,
-.a-sweet-kid-page .text-size-regular .bold-link:hover .text-outer {
+.a-sweet-kid-page .salon-link:hover,
+.a-sweet-kid-page .salon-link:hover .text-inner,
+.a-sweet-kid-page .salon-link:hover .text-outer {
     color: #b30000;
 }
 
@@ -1424,8 +1423,6 @@ body.dark-mode .not-found-ui-layer {
     /* cancel the global heading blur + scale so the image is crisp */
     transform: none;
     filter: none;
-    /* pull content below 5% closer */
-    margin-bottom: -5%;
 }
 
 .a-sweet-kid-page .heading-style-h1-image .h1-image-placeholder {

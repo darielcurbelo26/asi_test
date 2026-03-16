@@ -51,10 +51,13 @@ body.focus-mode #hint{opacity:0}
 #hud-tl{
   position:fixed;top:2.5rem;left:2.5rem;z-index:200;
   font-family:'IBM Plex Mono', monospace;
-  font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(250,250,250,.32);
-  pointer-events:none;line-height:1.2;text-shadow:0 8px 24px rgba(0,0,0,.45);
+  font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:#fff;
+  pointer-events:none;line-height:1.2;
   text-align:left;
-  max-width:min(32vw, 320px)
+  max-width:min(32vw, 320px);
+  /* align text center with the buttons in hud-tr (which have 0.55rem padding) */
+  padding-top:0.55rem;
+  mix-blend-mode:difference
 }
 #hud-tr{
   position:fixed;top:2.5rem;right:2.5rem;z-index:200;
@@ -77,7 +80,7 @@ body.focus-mode #hint{opacity:0}
   font-size: 10px;
   letter-spacing: 0.35em;
   text-transform: uppercase;
-  color: #fafafa;
+  color: #fff;
   transition: opacity .25s;
   padding: 0.55rem 1rem;
   margin: 0;
@@ -88,6 +91,7 @@ body.focus-mode #hint{opacity:0}
   pointer-events: auto;
   border-radius: 0;
   -webkit-tap-highlight-color: transparent;
+  mix-blend-mode: difference;
 }
 .hud-btn:hover, .fb-prev:hover, .fb-next:hover, #btn-room:hover { 
   opacity: 0.7;
@@ -112,10 +116,11 @@ body.focus-mode #hint{opacity:0}
 #hud-br{
   position:fixed;bottom:2.5rem;right:2.5rem;z-index:200;
   font-family:'IBM Plex Mono', monospace;
-  font-size:12px;letter-spacing:0.32em;text-transform:uppercase;color:rgba(250,250,250,.38);
-  pointer-events:none;line-height:1.2;text-shadow:0 8px 24px rgba(0,0,0,.4);
+  font-size:12px;letter-spacing:0.32em;text-transform:uppercase;color:#fff;
+  pointer-events:none;line-height:1.2;
   text-align:right;
-  max-width:min(32vw, 320px)
+  max-width:min(32vw, 320px);
+  mix-blend-mode:difference
 }
 
 /* ── ARTWORK CAPTION ── */
@@ -151,6 +156,23 @@ body.focus-mode #focus-bar {
   backdrop-filter:none;
 }
 
+/* ── CORNER NAVIGATION BUTTONS (Prev / Next) ── */
+#fb-prev{
+  position:fixed;bottom:5rem;left:2.5rem;z-index:200;
+}
+#fb-next{
+  position:fixed;bottom:5rem;right:2.5rem;z-index:200;
+}
+body:not(.focus-mode) #fb-prev,
+body:not(.focus-mode) #fb-next{
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+body.focus-mode #fb-prev,
+body.focus-mode #fb-next{
+  transition:opacity .4s;
+}
+
 /* ── FOCUSED BAR (top-centre) ── */
 #focus-bar{
   position:fixed;top:2.5rem;left:50%;transform:translateX(-50%);
@@ -174,16 +196,18 @@ body.focus-mode #focus-bar {
 
 .fb-count{
   font-family:'IBM Plex Mono', monospace;
-  font-size:10px;letter-spacing:0.2em;color:rgba(250,250,250,.25);
-  padding:0;pointer-events:none;line-height:1
+  font-size:10px;letter-spacing:0.2em;color:#fff;
+  padding:0;pointer-events:none;line-height:1;
+  mix-blend-mode:difference
 }
 
 /* ── EXPLORE HINT ── */
 #hint{
   position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
   font-size:12px;letter-spacing:0.38em;text-transform:uppercase;
-  color:rgba(255,255,255,.18);pointer-events:none;z-index:1;
-  text-align:center;line-height:2.5;transition:opacity 1.5s;text-shadow:0 10px 28px rgba(0,0,0,.6)
+  color:#fff;pointer-events:none;z-index:1;
+  text-align:center;line-height:2.5;transition:opacity 1.5s;
+  mix-blend-mode:difference
 }
 
 /* ── MOBILE ── */
@@ -228,6 +252,9 @@ body.focus-mode #focus-bar {
   }
   .fb-count { font-size:9px; letter-spacing:0.15em }
 
+  #fb-prev { bottom: calc(var(--edge-bottom) + 3.8rem); left: var(--edge-left); }
+  #fb-next { bottom: calc(var(--edge-bottom) + 3.8rem); right: var(--edge-right); }
+
   #caption {
     bottom:calc(var(--edge-bottom) + 2.9rem);
     width:calc(100vw - 2.2rem);
@@ -260,5 +287,6 @@ body.focus-mode #focus-bar {
 }
 @media (max-width:400px) {
   .fb-count { display:none }
-  .hud-btn, .fb-prev, .fb-next, #btn-room { padding:.75rem .6rem; letter-spacing:0.18em; flex:1 1 100% }
+  .hud-btn, #btn-room { padding:.75rem .6rem; letter-spacing:0.18em; }
+  #fb-prev, #fb-next { padding:.75rem .6rem; letter-spacing:0.18em; }
 }

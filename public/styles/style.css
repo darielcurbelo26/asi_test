@@ -1417,23 +1417,32 @@ body.dark-mode .not-found-ui-layer {
     color: #b30000;
 }
 
-/* Temporary visual for A Sweet Kid title using favicon artwork. */
+/* A Sweet Kid title: hide text, show wordmark image in its place. */
 .a-sweet-kid-page .heading-style-h1-image {
-    position: relative;
+    /* CSS grid stacks children into the same cell */
+    display: grid;
     width: min(100%, 980px);
+    /* cancel the global heading blur + scale so the image is crisp */
+    transform: none;
+    filter: none;
+}
+
+.a-sweet-kid-page .heading-style-h1-image .h1-image-placeholder,
+.a-sweet-kid-page .heading-style-h1-image img {
+    grid-area: 1 / 1;
 }
 
 .a-sweet-kid-page .heading-style-h1-image .h1-image-placeholder {
-    visibility: hidden;
+    visibility: hidden;   /* preserves height, hides text */
+    pointer-events: none;
 }
 
 .a-sweet-kid-page .heading-style-h1-image img {
-    position: absolute;
-    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: contain;
     object-position: center;
+    pointer-events: none;
 }
 
 @media (max-width: 768px) {

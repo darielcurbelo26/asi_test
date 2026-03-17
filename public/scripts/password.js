@@ -182,11 +182,8 @@
             sessionStorage.removeItem(attemptsKey);
             sessionStorage.setItem('tatc-unlocked', 'true');
             if (isAdmin) sessionStorage.setItem('tatc-admin-unlocked', 'true');
-            if (window.canviaPagina) {
-                window.canviaPagina(redirectPage);
-            } else {
-                window.location.href = redirectPage;
-            }
+            // Use replace() so the password page is not kept in browser history (mimics HTTP 301)
+            window.location.replace(redirectPage);
         }
 
         // Recovery code bypasses lockout

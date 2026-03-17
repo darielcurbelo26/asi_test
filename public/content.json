@@ -215,7 +215,8 @@
     "pages": {
       "projects.html": "public",
       "artist.html": "public",
-      "blog.html": "public",
+      "blog.html": "private",
+      "post.html": "private",
       "a-sweet-kid-online.html": "private"
     },
     "page_passwords": {

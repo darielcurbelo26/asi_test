@@ -658,6 +658,7 @@ async function publishContentJSON() {
 async function publishLive() {
   if (currentPostSlug) savePost();
   collectAll();
+  await hashPasswordFields();
   const cfg = collectPublishConfig();
   localStorage.setItem('tatc_cms', JSON.stringify(DATA));
   if (cfg.platform === 'download') {
@@ -1193,6 +1194,7 @@ function collectAll(){
 async function saveAll(){
   if(currentPostSlug)savePost();
   collectAll();
+  await hashPasswordFields();
   const publishCfg = collectPublishConfig();
   localStorage.setItem('tatc_cms', JSON.stringify(DATA));
   markDirty(false);
@@ -1203,9 +1205,10 @@ async function saveAll(){
   }
 }
 
-function exportJSON(){
+async function exportJSON(){
   if(currentPostSlug)savePost();
   collectAll();
+  await hashPasswordFields();
   collectPublishConfig();
   localStorage.setItem('tatc_cms', JSON.stringify(DATA));
   const blob=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
@@ -1220,6 +1223,35 @@ function sv(id,val){ const el=document.getElementById(id); if(el&&val!==undefine
 function gv(id){ const el=document.getElementById(id); return el ? el.value : null; }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function livePreview(){}
+
+// SHA-256 helper — hashes passwords before storing in content.json
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Returns true if value already looks like a SHA-256 hash (64 hex chars)
+function isSha256Hash(val) { return /^[0-9a-fA-F]{64}$/.test(val); }
+
+// Hash plain-text password fields in DATA.security before any save/export
+async function hashPasswordFields() {
+  const s = DATA.security;
+  if (!s) return;
+  try {
+    if (s.gate_password && !isSha256Hash(s.gate_password)) {
+      s.gate_password = await sha256(s.gate_password);
+    }
+    if (s.admin_password && !isSha256Hash(s.admin_password)) {
+      s.admin_password = await sha256(s.admin_password);
+    }
+  } catch (err) {
+    console.error('Password hashing failed', err);
+    setStatus('Password hashing failed — passwords not saved.', 'error');
+    throw err;
+  }
+}
 
 let stTimer;
 function setStatus(msg,type=''){

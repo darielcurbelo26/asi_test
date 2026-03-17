@@ -1,5 +1,12 @@
 // password.js — gateway logic with lockout, hints, and recovery
 (function () {
+    // SHA-256 helper using Web Crypto API (available in all modern browsers)
+    async function sha256(message) {
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
     const pForm = document.getElementById('pForm');
     const pInput = document.getElementById('pInput');
     const gateTitle = document.querySelector('.section_hero-title-password');
@@ -168,7 +175,7 @@
     if (initialLock) showLocked(initialLock);
 
     // --- Form submit ---
-    pForm.addEventListener('submit', (e) => {
+    pForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         // Re-check in case lockout just started
@@ -189,10 +196,18 @@
             }
         }
 
-        // Recovery code bypasses lockout
+        // Recovery code bypasses lockout (compared as plain text)
         if (recoveryCode && val === recoveryCode) { grantAccess(); return; }
 
-        if (val === correctPassword) {
+        let hashedVal;
+        try {
+            hashedVal = await sha256(val);
+        } catch (err) {
+            console.error('Password hashing failed', err);
+            return;
+        }
+
+        if (hashedVal === correctPassword) {
             grantAccess();
         } else {
             // Shake animation

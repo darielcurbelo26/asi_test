@@ -185,7 +185,7 @@
             if (window.canviaPagina) {
                 window.canviaPagina(redirectPage);
             } else {
-                window.location.href = redirectPage;
+                location.replace(redirectPage);
             }
         }
 

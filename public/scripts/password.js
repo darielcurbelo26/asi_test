@@ -194,8 +194,14 @@
             window.location.href = redirectPage;
         }
 
+        // If no password configured, auto-unlock
+        if (!correctPassword) { grantAccess(); return; }
+
         // Recovery code bypasses lockout (plaintext comparison)
         if (recoveryCode && val === recoveryCode) { grantAccess(); return; }
+
+        // Try plaintext match first (in case password stored as plaintext)
+        if (val === correctPassword) { grantAccess(); return; }
 
         const hashedInput = await sha256Hex(val);
         if (hashedInput === correctPassword) {

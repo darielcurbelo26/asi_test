@@ -231,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let sequenceWidth = 0;
         let baseSlideCount = 0;
         let measurePending = false;
+        let animFrameId = null;
 
         function scheduleMeasure() {
             if (measurePending) return;
@@ -271,6 +272,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function buildTrack() {
+            if (animFrameId) {
+                cancelAnimationFrame(animFrameId);
+                animFrameId = null;
+            }
             const desiredSpan = Math.max((row.clientWidth || window.innerWidth) * 1.5, window.innerWidth + 320);
             const startIdx = Math.floor(Math.random() * images.length);
             const baseSlides = [];
@@ -301,7 +306,9 @@ document.addEventListener('DOMContentLoaded', () => {
             measureSequenceWidth();
             if (!sequenceWidth) sequenceWidth = estimatedSpan * Math.max(1, baseSlideCount);
             currentX = direction === -1 ? -2 * sequenceWidth : -sequenceWidth;
+            track.style.visibility = 'hidden';
             gsap.set(track, { x: currentX });
+            requestAnimationFrame(() => { track.style.visibility = ''; });
 
             track.querySelectorAll('img').forEach((img) => {
                 const slide = img.closest('.carousel-slide');
@@ -314,6 +321,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     scheduleMeasure();
                 }, { passive: true });
             });
+
+            animFrameId = requestAnimationFrame(animate);
         }
 
         buildTrack();
@@ -326,9 +335,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             wrapPosition();
             gsap.set(track, { x: currentX });
-            requestAnimationFrame(animate);
+            animFrameId = requestAnimationFrame(animate);
         }
-        requestAnimationFrame(animate);
 
         // Mouse wheel and trackpad acceleration (both axes)
         row.addEventListener('wheel', (e) => {
@@ -392,10 +400,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        let resizeTimer = null;
         window.addEventListener('resize', () => {
-            setTimeout(() => {
+            if (resizeTimer) clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
                 buildTrack();
-            }, 150);
+            }, 250);
         });
     });
 });

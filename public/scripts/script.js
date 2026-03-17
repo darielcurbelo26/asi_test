@@ -182,146 +182,152 @@ document.addEventListener('DOMContentLoaded', () => {
         window.canviaPagina(link.href);
     }, true);
 
-    // Changed: Don't pause initially, manage flow with logic below
-    const entranceTimeline = gsap.timeline({
-        paused: true,
-        defaults: { ease: 'power3.out', duration: 1.3 }
-    });
-
-    // Run entrance logic
-    function playEntrance() {
-        if (entranceTimeline.progress() > 0) return; // Already started
-        entranceTimeline.play();
-    }
-
-    // Hidden by default to avoid flash, but managed by to()
-    gsap.set('.nav_component, .heading-style-h1, .section_hero-title-password, .not-found-title, .fixed-controls_component > *, .text-size-regular, .text-style-label, .not-found-sub, .password-form', {
-        opacity: 0
-    });
-
-    // Navbar from top
-    if (document.querySelector('.nav_component')) {
-        entranceTimeline.to('.nav_component', {
-            y: 0,
-            opacity: 1,
-            startAt: { y: -50 },
-            duration: 1
-        }, 0.2);
-    }
-
-    // Main Titles - Scale and Fade (maintaining specific scales)
-    if (document.querySelector('.heading-style-h1')) {
-        entranceTimeline.to('.heading-style-h1', {
-            scale: 1.2,
-            opacity: 1,
-            filter: 'blur(0.5px)',
-            startAt: { scale: 1.3, opacity: 0, filter: 'blur(10px)' },
-            duration: 1.0
-        }, 0);
-    }
-
-    if (document.querySelector('.section_hero-title-password')) {
-        entranceTimeline.to('.section_hero-title-password', {
-            scale: 1.1,
-            opacity: 1,
-            filter: 'blur(0.5px)',
-            startAt: { scale: 1.2, opacity: 0, filter: 'blur(10px)' },
-            duration: 1.8
-        }, 0.3);
-    }
-
-    if (document.querySelector('.not-found-title')) {
-        entranceTimeline.to('.not-found-title', {
-            scale: 1,
-            opacity: 1,
-            startAt: { scale: 1.1, opacity: 0 },
-            duration: 1.8
-        }, 0.3);
-    }
-
-    // 404 Red background
-    if (document.querySelector('.not-found-bg')) {
-        entranceTimeline.to('.not-found-bg', {
-            opacity: 1,
-            filter: 'blur(8px)',
-            startAt: { opacity: 0, filter: 'blur(30px)' },
-            duration: 2.5
-        }, 0.2);
-    }
-
-    // Secondary Content - Fade and Slide Up
-    const content = '.text-size-regular, .text-style-label, .not-found-sub, .password-form, .heading-style-h2';
-    if (document.querySelector(content)) {
-        entranceTimeline.to(content, {
-            y: 0,
-            opacity: 1,
-            startAt: { y: 20, opacity: 0 },
-            stagger: 0.02,
-            duration: 0.8
-        }, 0.2);
-
-        // Important: clear transform after the entrance animation.
-        // Leaving a transform on text can cause subpixel/AA artifacts when theme colors dissolve.
-        entranceTimeline.eventCallback('onComplete', () => {
-            gsap.set(content, { clearProps: 'transform' });
+    // Entrance animations require GSAP. Wrap in try-catch so the burger menu
+    // and other essential UI keeps working even when the CDN is blocked.
+    try {
+        // Changed: Don't pause initially, manage flow with logic below
+        const entranceTimeline = gsap.timeline({
+            paused: true,
+            defaults: { ease: 'power3.out', duration: 1.3 }
         });
-    }
 
-    // Bottom Toggles
-    if (document.querySelector('.fixed-controls_component')) {
-        entranceTimeline.to('.fixed-controls_component > *', {
-            scale: 1,
-            opacity: 1,
-            startAt: { scale: 0, opacity: 0 },
-            stagger: 0.08,
-            duration: 1,
-            ease: 'back.out(1.5)'
-        }, 0.7);
-    }
+        // Run entrance logic
+        function playEntrance() {
+            if (entranceTimeline.progress() > 0) return; // Already started
+            entranceTimeline.play();
+        }
 
-    // Staggered Nav Links (if sidebar is open or for desktop)
-    if (document.querySelector('.nav_list')) {
-        entranceTimeline.to('.nav_list a', {
-            x: 0,
-            opacity: 1,
-            startAt: { x: 15, opacity: 0 },
-            stagger: 0.05,
-            duration: 0.8
-        }, 0.1);
-    }
+        // Hidden by default to avoid flash, but managed by to()
+        gsap.set('.nav_component, .heading-style-h1, .section_hero-title-password, .not-found-title, .fixed-controls_component > *, .text-size-regular, .text-style-label, .not-found-sub, .password-form', {
+            opacity: 0
+        });
 
-    // Cube (if exists)
-    const cubeCont = document.getElementById('cube-container');
-    if (cubeCont) {
-        gsap.set(cubeCont, { visibility: 'visible', opacity: 0, filter: 'blur(20px)', scale: 0.95 });
-        entranceTimeline.to(cubeCont, {
-            opacity: 1,
-            filter: 'blur(0px)',
-            scale: 1,
-            duration: 2,
-            ease: 'power2.out'
-        }, 0.6);
-    }
+        // Navbar from top
+        if (document.querySelector('.nav_component')) {
+            entranceTimeline.to('.nav_component', {
+                y: 0,
+                opacity: 1,
+                startAt: { y: -50 },
+                duration: 1
+            }, 0.2);
+        }
 
-    // Check loader state after timeline steps are fully configured.
-    // Otherwise playEntrance() can run on an empty timeline and never reveal hidden elements.
-    const loaderExists = document.getElementById('loader-wrapper') || document.getElementById('loader');
-    const isLoaded = sessionStorage.getItem('tatc-loaded');
+        // Main Titles - Scale and Fade (maintaining specific scales)
+        if (document.querySelector('.heading-style-h1')) {
+            entranceTimeline.to('.heading-style-h1', {
+                scale: 1.2,
+                opacity: 1,
+                filter: 'blur(0.5px)',
+                startAt: { scale: 1.3, opacity: 0, filter: 'blur(10px)' },
+                duration: 1.0
+            }, 0);
+        }
 
-    if (isLoaded || !loaderExists) {
-        // No loader needed or already done -> play immediately
-        playEntrance();
-    } else {
-        // Wait for loader, but if it's already dispatching, catch it
-        entranceTimeline.pause(); // Pause because we know loader is active
-        document.addEventListener('tatc:loaderDone', () => {
+        if (document.querySelector('.section_hero-title-password')) {
+            entranceTimeline.to('.section_hero-title-password', {
+                scale: 1.1,
+                opacity: 1,
+                filter: 'blur(0.5px)',
+                startAt: { scale: 1.2, opacity: 0, filter: 'blur(10px)' },
+                duration: 1.8
+            }, 0.3);
+        }
+
+        if (document.querySelector('.not-found-title')) {
+            entranceTimeline.to('.not-found-title', {
+                scale: 1,
+                opacity: 1,
+                startAt: { scale: 1.1, opacity: 0 },
+                duration: 1.8
+            }, 0.3);
+        }
+
+        // 404 Red background
+        if (document.querySelector('.not-found-bg')) {
+            entranceTimeline.to('.not-found-bg', {
+                opacity: 1,
+                filter: 'blur(8px)',
+                startAt: { opacity: 0, filter: 'blur(30px)' },
+                duration: 2.5
+            }, 0.2);
+        }
+
+        // Secondary Content - Fade and Slide Up
+        const content = '.text-size-regular, .text-style-label, .not-found-sub, .password-form, .heading-style-h2';
+        if (document.querySelector(content)) {
+            entranceTimeline.to(content, {
+                y: 0,
+                opacity: 1,
+                startAt: { y: 20, opacity: 0 },
+                stagger: 0.02,
+                duration: 0.8
+            }, 0.2);
+
+            // Important: clear transform after the entrance animation.
+            // Leaving a transform on text can cause subpixel/AA artifacts when theme colors dissolve.
+            entranceTimeline.eventCallback('onComplete', () => {
+                gsap.set(content, { clearProps: 'transform' });
+            });
+        }
+
+        // Bottom Toggles
+        if (document.querySelector('.fixed-controls_component')) {
+            entranceTimeline.to('.fixed-controls_component > *', {
+                scale: 1,
+                opacity: 1,
+                startAt: { scale: 0, opacity: 0 },
+                stagger: 0.08,
+                duration: 1,
+                ease: 'back.out(1.5)'
+            }, 0.7);
+        }
+
+        // Staggered Nav Links (if sidebar is open or for desktop)
+        if (document.querySelector('.nav_list')) {
+            entranceTimeline.to('.nav_list a', {
+                x: 0,
+                opacity: 1,
+                startAt: { x: 15, opacity: 0 },
+                stagger: 0.05,
+                duration: 0.8
+            }, 0.1);
+        }
+
+        // Cube (if exists)
+        const cubeCont = document.getElementById('cube-container');
+        if (cubeCont) {
+            gsap.set(cubeCont, { visibility: 'visible', opacity: 0, filter: 'blur(20px)', scale: 0.95 });
+            entranceTimeline.to(cubeCont, {
+                opacity: 1,
+                filter: 'blur(0px)',
+                scale: 1,
+                duration: 2,
+                ease: 'power2.out'
+            }, 0.6);
+        }
+
+        // Check loader state after timeline steps are fully configured.
+        // Otherwise playEntrance() can run on an empty timeline and never reveal hidden elements.
+        const loaderExists = document.getElementById('loader-wrapper') || document.getElementById('loader');
+        const isLoaded = sessionStorage.getItem('tatc-loaded');
+
+        if (isLoaded || !loaderExists) {
+            // No loader needed or already done -> play immediately
             playEntrance();
-        });
+        } else {
+            // Wait for loader, but if it's already dispatching, catch it
+            entranceTimeline.pause(); // Pause because we know loader is active
+            document.addEventListener('tatc:loaderDone', () => {
+                playEntrance();
+            });
 
-        // Safety: If loader takes too long or event missed
-        setTimeout(() => {
-            if (entranceTimeline.progress() === 0) playEntrance();
-        }, 12000);
+            // Safety: If loader takes too long or event missed
+            setTimeout(() => {
+                if (entranceTimeline.progress() === 0) playEntrance();
+            }, 12000);
+        }
+    } catch (e) {
+        console.warn('[TATC] Entrance animations unavailable:', e.message);
     }
 
     // --- 1. BURGER MENU ---

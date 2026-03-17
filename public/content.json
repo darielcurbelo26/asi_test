@@ -201,7 +201,7 @@
     "bio2": "At the heart of her work lies a mission to reveal people to themselves at their own pace. Though her pieces often emerge from periods of isolation, they paradoxically seek to validate the shared nature of personal struggles."
   },
   "security": {
-    "gate_password": "sweet",
+    "gate_password": "b9043c16af362f30807deaf692025d61c3c803bba1efc43fe2f63dc8b507418d",
     "gate_title": "ASWEETKID",
     "gate_description": "LAUNCHING ON FEBRUARY 7TH AT 7PM CST",
     "max_attempts": 5,
@@ -210,12 +210,13 @@
     "password_hint": "",
     "recovery_email": "",
     "recovery_code": "",
-    "admin_password": "sweet",
+    "admin_password": "b9043c16af362f30807deaf692025d61c3c803bba1efc43fe2f63dc8b507418d",
     "admin_recovery_code": "",
     "pages": {
       "projects.html": "public",
       "artist.html": "public",
-      "blog.html": "public",
+      "blog.html": "private",
+      "post.html": "private",
       "a-sweet-kid-online.html": "private"
     },
     "page_passwords": {

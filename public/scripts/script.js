@@ -183,6 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }, true);
 
     // Changed: Don't pause initially, manage flow with logic below
+    const ENTRANCE_SELECTOR = '.nav_component, .heading-style-h1, .section_hero-title-password, .not-found-title, .fixed-controls_component > *, .text-size-regular, .text-style-label, .not-found-sub, .password-form';
+    try {
     const entranceTimeline = gsap.timeline({
         paused: true,
         defaults: { ease: 'power3.out', duration: 1.3 }
@@ -195,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Hidden by default to avoid flash, but managed by to()
-    gsap.set('.nav_component, .heading-style-h1, .section_hero-title-password, .not-found-title, .fixed-controls_component > *, .text-size-regular, .text-style-label, .not-found-sub, .password-form', {
+    gsap.set(ENTRANCE_SELECTOR, {
         opacity: 0
     });
 
@@ -322,6 +324,13 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             if (entranceTimeline.progress() === 0) playEntrance();
         }, 12000);
+    }
+    } catch (e) {
+        // GSAP not available — reveal all hidden elements immediately so the
+        // page is still usable without animations.
+        document.querySelectorAll(ENTRANCE_SELECTOR).forEach((el) => {
+            el.style.opacity = '1';
+        });
     }
 
     // --- 1. BURGER MENU ---

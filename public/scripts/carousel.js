@@ -253,6 +253,25 @@ document.addEventListener('DOMContentLoaded', () => {
             while (currentX > -sequenceWidth) currentX -= sequenceWidth;
         }
 
+        // Batches all image-load width recalculations into a single rAF to prevent
+        // rapid successive position jumps that cause visible flicker.
+        let measurePending = false;
+        function scheduleMeasure() {
+            if (measurePending) return;
+            measurePending = true;
+            requestAnimationFrame(() => {
+                measurePending = false;
+                const previous = sequenceWidth;
+                measureSequenceWidth();
+                if (previous > 0 && sequenceWidth > 0) {
+                    const ratio = sequenceWidth / previous;
+                    currentX *= ratio;
+                    wrapPosition();
+                    gsap.set(track, { x: currentX });
+                }
+            });
+        }
+
         function buildTrack() {
             const desiredSpan = Math.max((row.clientWidth || window.innerWidth) * 1.5, window.innerWidth + 320);
             const startIdx = Math.floor(Math.random() * images.length);
@@ -283,7 +302,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             measureSequenceWidth();
             if (!sequenceWidth) sequenceWidth = estimatedSpan * Math.max(1, baseSlideCount);
-            currentX = -sequenceWidth;
+            // Reverse rows start two sequence-widths back so they have a full
+            // sequenceWidth of room before the first wrap, avoiding an instant jump.
+            currentX = direction < 0 ? -2 * sequenceWidth : -sequenceWidth;
             gsap.set(track, { x: currentX });
 
             track.querySelectorAll('img').forEach((img) => {
@@ -292,16 +313,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Ensure cloned slides also get aspect-ratio-based widths.
                 fitSlideWidth(slide, img);
 
+                // Batch all load events within one frame into a single adjustment.
                 img.addEventListener('load', () => {
                     fitSlideWidth(slide, img);
-                    const previous = sequenceWidth;
-                    measureSequenceWidth();
-                    if (previous > 0 && sequenceWidth > 0) {
-                        const ratio = sequenceWidth / previous;
-                        currentX *= ratio;
-                        wrapPosition();
-                        gsap.set(track, { x: currentX });
-                    }
+                    scheduleMeasure();
                 }, { passive: true });
             });
         }
@@ -320,12 +335,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         requestAnimationFrame(animate);
 
-        // Trackpad acceleration (Horizontal Scroll)
+        // Mouse wheel / trackpad scroll (both axes)
+        // deltaY > 0 (scroll down) nudges the carousel in the negative direction (leftward),
+        // matching the feel of natural horizontal scroll for a vertically-mounted mouse wheel.
         row.addEventListener('wheel', (e) => {
-            if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-                e.preventDefault();
-            }
-            velocity -= e.deltaX * 0.02;
+            e.preventDefault();
+            const delta = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+            velocity -= delta * 0.05;
         }, { passive: false });
 
         // Touch Swipe acceleration (Mobile)

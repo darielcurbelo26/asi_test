@@ -91,11 +91,27 @@ document.addEventListener('DOMContentLoaded', () => {
         </nav>
     `;
 
+    // Capture any extra classes from the existing .nav_component before replacing it
+    // (e.g. is-solid on the projects page).
+    const extraNavClasses = [];
+    const existingNav = document.querySelector('.nav_component');
+    if (existingNav) {
+        existingNav.classList.forEach((cls) => {
+            if (cls !== 'nav_component') extraNavClasses.push(cls);
+        });
+    }
+
     // Remove any existing nav instance before reinserting a fresh one.
     document.querySelectorAll('.nav_component, .nav_menu').forEach((el) => el.remove());
 
     // Insert at the beginning of body.
     document.body.insertAdjacentHTML('afterbegin', navHTML);
+
+    // Re-apply any page-specific classes to the newly injected nav.
+    if (extraNavClasses.length > 0) {
+        const newNav = document.querySelector('.nav_component');
+        if (newNav) newNav.classList.add(...extraNavClasses);
+    }
 
     const scopes = document.querySelectorAll('.nav_component, .nav_menu');
     const initialData = resolveContent();

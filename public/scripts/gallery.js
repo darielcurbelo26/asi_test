@@ -11,26 +11,23 @@
         const overlayImg = document.getElementById('overlay-img');
         const btnPrev = document.querySelector('.overlay-prev');
         const btnNext = document.querySelector('.overlay-next');
-        const isMobileLayout = window.matchMedia('(max-width: 768px), (hover: none), (pointer: coarse)').matches;
 
         if (!container || !overlay || !overlayImg || !window.gsap || !window.ScrollTrigger) return;
 
-        const itemCount = isMobileLayout ? 18 : 28;
+        const itemCount = 28;
         const images = [];
         const imagesSrcList = [];
 
         const columns = 6;
         const rows = 5;
-        let cells = [];
-        if (!isMobileLayout) {
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < columns; c++) {
-                    if (r >= 2 && r <= 2 && c >= 2 && c <= 3) continue;
-                    cells.push({ r, c });
-                }
+        const cells = [];
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < columns; c++) {
+                if (r === 2 && c >= 2 && c <= 3) continue;
+                cells.push({ r, c });
             }
-            cells.sort(() => Math.random() - 0.5);
         }
+        cells.sort(() => Math.random() - 0.5);
 
         let currentIdx = 0;
         const updateOverlay = () => {
@@ -67,7 +64,7 @@
             if (e.key === 'ArrowLeft') btnPrev?.click();
         });
 
-        const totalItems = isMobileLayout ? itemCount : Math.min(itemCount, cells.length);
+        const totalItems = Math.min(itemCount, cells.length);
 
         for (let i = 0; i < totalItems; i++) {
             const img = document.createElement('img');
@@ -76,30 +73,24 @@
             img.src = src;
             img.loading = 'lazy';
             img.decoding = 'async';
-            img.className = isMobileLayout ? 'gallery-item gallery-item-mobile' : 'gallery-item';
+            img.className = 'gallery-item';
             imagesSrcList.push(src);
 
-            if (!isMobileLayout) {
-                const cell = cells[i];
-                const xBase = (cell.c / columns) * 100;
-                const yBase = (cell.r / rows) * 100;
+            const cell = cells[i];
+            const xBase = (cell.c / columns) * 100;
+            const yBase = (cell.r / rows) * 100;
 
-                const xJitter = (Math.random() * 4) - 2;
-                const yJitter = (Math.random() * 4) - 2;
+            const xJitter = (Math.random() * 4) - 2;
+            const yJitter = (Math.random() * 4) - 2;
 
-                img.style.left = `${xBase + 5 + xJitter}%`;
-                img.style.top = `${yBase + 5 + yJitter}%`;
-                img.style.transform = 'scale(0.8) rotate(0deg)';
-            }
+            img.style.left = `${xBase + 5 + xJitter}%`;
+            img.style.top = `${yBase + 5 + yJitter}%`;
+            img.style.transform = 'scale(0.8) rotate(0deg)';
 
             img.addEventListener('click', () => openOverlay(i));
 
             container.appendChild(img);
             images.push(img);
-        }
-
-        if (isMobileLayout) {
-            return;
         }
 
         let scrollY = window.pageYOffset || document.documentElement.scrollTop;

@@ -167,8 +167,17 @@
     const initialLock = getLockoutState();
     if (initialLock) showLocked(initialLock);
 
+    // --- SHA-256 helper ---
+    async function sha256Hex(text) {
+        const data = new TextEncoder().encode(text);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hashBuffer))
+            .map(b => b.toString(16).padStart(2, '0'))
+            .join('');
+    }
+
     // --- Form submit ---
-    pForm.addEventListener('submit', (e) => {
+    pForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         // Re-check in case lockout just started
@@ -185,14 +194,15 @@
             if (window.canviaPagina) {
                 window.canviaPagina(redirectPage);
             } else {
-                window.location.href = redirectPage;
+                window.location.replace(redirectPage);
             }
         }
 
-        // Recovery code bypasses lockout
+        // Recovery code bypasses lockout (plaintext comparison)
         if (recoveryCode && val === recoveryCode) { grantAccess(); return; }
 
-        if (val === correctPassword) {
+        const hashedInput = await sha256Hex(val);
+        if (hashedInput === correctPassword) {
             grantAccess();
         } else {
             // Shake animation

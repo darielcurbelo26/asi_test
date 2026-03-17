@@ -91,11 +91,23 @@ document.addEventListener('DOMContentLoaded', () => {
         </nav>
     `;
 
+    // Preserve extra classes (e.g. is-solid) from any existing nav_component.
+    const existingNav = document.querySelector('.nav_component');
+    const extraNavClasses = existingNav
+        ? Array.from(existingNav.classList).filter(c => c !== 'nav_component')
+        : [];
+
     // Remove any existing nav instance before reinserting a fresh one.
     document.querySelectorAll('.nav_component, .nav_menu').forEach((el) => el.remove());
 
     // Insert at the beginning of body.
     document.body.insertAdjacentHTML('afterbegin', navHTML);
+
+    // Re-apply any preserved classes to the new nav_component.
+    if (extraNavClasses.length > 0) {
+        const newNav = document.querySelector('.nav_component');
+        if (newNav) newNav.classList.add(...extraNavClasses);
+    }
 
     const scopes = document.querySelectorAll('.nav_component, .nav_menu');
     const initialData = resolveContent();

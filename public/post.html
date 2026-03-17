@@ -12,6 +12,29 @@
     <link rel="stylesheet" href="styles/post.css">
     <script src="scripts/cms-engine.js" defer></script>
     <script src="scripts/design-system.js"></script>
+    <style>body { display: none; }</style>
+    <script>
+    (function () {
+        var page = 'post.html';
+        if (sessionStorage.getItem('tatc-unlocked') === 'true') {
+            document.addEventListener('DOMContentLoaded', function () { document.body.style.display = ''; });
+            return;
+        }
+        fetch('content.json', { cache: 'no-cache' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                var pages = data && data.security && data.security.pages;
+                if (pages && pages[page] === 'private') {
+                    window.location.replace('password.html?redirect=' + page);
+                } else {
+                    document.body.style.display = '';
+                }
+            })
+            .catch(function () {
+                window.location.replace('password.html?redirect=' + page);
+            });
+    }());
+    </script>
 </head>
 
 <body class="body_no-fixed">

@@ -230,6 +230,23 @@ document.addEventListener('DOMContentLoaded', () => {
         let startX = 0, lastX = 0, lastTime = 0;
         let sequenceWidth = 0;
         let baseSlideCount = 0;
+        let measurePending = false;
+
+        function scheduleMeasure() {
+            if (measurePending) return;
+            measurePending = true;
+            requestAnimationFrame(() => {
+                measurePending = false;
+                const previous = sequenceWidth;
+                measureSequenceWidth();
+                if (previous > 0 && sequenceWidth > 0) {
+                    const ratio = sequenceWidth / previous;
+                    currentX *= ratio;
+                    wrapPosition();
+                    gsap.set(track, { x: currentX });
+                }
+            });
+        }
 
         const getSlideSpan = (slideEl) => {
             if (!slideEl) return estimatedSpan;
@@ -283,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             measureSequenceWidth();
             if (!sequenceWidth) sequenceWidth = estimatedSpan * Math.max(1, baseSlideCount);
-            currentX = -sequenceWidth;
+            currentX = direction === -1 ? -2 * sequenceWidth : -sequenceWidth;
             gsap.set(track, { x: currentX });
 
             track.querySelectorAll('img').forEach((img) => {
@@ -294,14 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 img.addEventListener('load', () => {
                     fitSlideWidth(slide, img);
-                    const previous = sequenceWidth;
-                    measureSequenceWidth();
-                    if (previous > 0 && sequenceWidth > 0) {
-                        const ratio = sequenceWidth / previous;
-                        currentX *= ratio;
-                        wrapPosition();
-                        gsap.set(track, { x: currentX });
-                    }
+                    scheduleMeasure();
                 }, { passive: true });
             });
         }
@@ -320,12 +330,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         requestAnimationFrame(animate);
 
-        // Trackpad acceleration (Horizontal Scroll)
+        // Mouse wheel and trackpad acceleration (both axes)
         row.addEventListener('wheel', (e) => {
-            if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-                e.preventDefault();
-            }
-            velocity -= e.deltaX * 0.02;
+            e.preventDefault();
+            const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+            velocity -= delta * 0.02;
         }, { passive: false });
 
         // Touch Swipe acceleration (Mobile)

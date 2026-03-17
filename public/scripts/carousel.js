@@ -266,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function wrapPosition() {
             if (!sequenceWidth) return;
-            while (currentX <= -2 * sequenceWidth) currentX += sequenceWidth;
+            while (currentX < -2 * sequenceWidth) currentX += sequenceWidth;
             while (currentX > -sequenceWidth) currentX -= sequenceWidth;
         }
 
@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
         row.addEventListener('wheel', (e) => {
             e.preventDefault();
             const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-            velocity -= delta * 0.02;
+            velocity -= delta * 0.02 * direction;
         }, { passive: false });
 
         // Touch Swipe acceleration (Mobile)

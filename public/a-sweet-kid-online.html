@@ -7,6 +7,33 @@
 <link rel="icon" type="image/svg+xml" href="assets/fav_icon/red-circle.svg">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Inter:ital,slnt,wght@0,0,100..900;1,0,100..900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles/a-sweet-kid-online.css">
+<script>
+(function () {
+    async function checkSecurity() {
+        try {
+            let data = null;
+            const draft = localStorage.getItem('tatc_cms');
+            if (draft) data = JSON.parse(draft);
+            if (!data) {
+                const res = await fetch('content.json', { cache: 'no-cache' });
+                if (res.ok) data = await res.json();
+            }
+            if (!data) return;
+            const security = data.security;
+            if (!security) return;
+            const page = window.location.pathname.split('/').pop() || 'index.html';
+            const visibility = security.pages?.[page] || 'public';
+            const isUnlocked = sessionStorage.getItem('tatc-unlocked') === 'true';
+            if (visibility === 'private' && !isUnlocked) {
+                window.location.href = 'password.html?redirect=' + page;
+            }
+        } catch (e) {
+            console.warn('Security check failed:', e);
+        }
+    }
+    checkSecurity();
+})();
+</script>
 </head>
 <body>
 

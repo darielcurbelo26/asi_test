@@ -191,11 +191,7 @@
             sessionStorage.removeItem(attemptsKey);
             sessionStorage.setItem('tatc-unlocked', 'true');
             if (isAdmin) sessionStorage.setItem('tatc-admin-unlocked', 'true');
-            if (window.canviaPagina) {
-                window.canviaPagina(redirectPage);
-            } else {
-                window.location.replace(redirectPage);
-            }
+            window.location.href = redirectPage;
         }
 
         // Recovery code bypasses lockout (plaintext comparison)

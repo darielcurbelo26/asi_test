@@ -150,8 +150,9 @@ body.focus-mode #hint{opacity:0}
   pointer-events:none;line-height:1.2;
   text-align:right;
   max-width:min(32vw, 320px);
-  mix-blend-mode:difference
+  transition:opacity .4s
 }
+body.focus-mode #hud-br{opacity:0;pointer-events:none}
 
 /* ── ARTWORK CAPTION ── */
 #caption{

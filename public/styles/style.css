@@ -678,6 +678,7 @@ body.dark-mode .social_link img {
     border: 1px solid var(--cube-border);
     backface-visibility: hidden;
     transition: background-color var(--theme-transition), border-color var(--theme-transition);
+    user-select: none;
 }
 
 .cube-face img {

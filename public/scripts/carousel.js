@@ -283,8 +283,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
             measureSequenceWidth();
             if (!sequenceWidth) sequenceWidth = estimatedSpan * Math.max(1, baseSlideCount);
-            currentX = -sequenceWidth;
+            // For rightward-scrolling rows, start at -2×sequenceWidth so the first
+            // animation frame doesn't immediately trigger a wrap jump.
+            currentX = direction === -1 ? -2 * sequenceWidth : -sequenceWidth;
             gsap.set(track, { x: currentX });
+
+            // Debounce image-load adjustments so rapid successive loads don't cause
+            // multiple visible position jumps (flicker).
+            let measurePending = false;
+            let lastMeasuredWidth = sequenceWidth;
+
+            function scheduleMeasure() {
+                if (measurePending) return;
+                measurePending = true;
+                requestAnimationFrame(() => {
+                    measurePending = false;
+                    const previous = lastMeasuredWidth;
+                    measureSequenceWidth();
+                    lastMeasuredWidth = sequenceWidth;
+                    if (previous > 0 && sequenceWidth > 0 && previous !== sequenceWidth) {
+                        const ratio = sequenceWidth / previous;
+                        currentX *= ratio;
+                        wrapPosition();
+                        gsap.set(track, { x: currentX });
+                    }
+                });
+            }
 
             track.querySelectorAll('img').forEach((img) => {
                 const slide = img.closest('.carousel-slide');
@@ -294,14 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 img.addEventListener('load', () => {
                     fitSlideWidth(slide, img);
-                    const previous = sequenceWidth;
-                    measureSequenceWidth();
-                    if (previous > 0 && sequenceWidth > 0) {
-                        const ratio = sequenceWidth / previous;
-                        currentX *= ratio;
-                        wrapPosition();
-                        gsap.set(track, { x: currentX });
-                    }
+                    scheduleMeasure();
                 }, { passive: true });
             });
         }
@@ -320,12 +337,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         requestAnimationFrame(animate);
 
-        // Trackpad acceleration (Horizontal Scroll)
+        // Trackpad + Mouse Wheel acceleration
         row.addEventListener('wheel', (e) => {
-            if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-                e.preventDefault();
-            }
-            velocity -= e.deltaX * 0.02;
+            e.preventDefault();
+            // Use whichever axis has more movement (horizontal trackpad vs vertical mouse wheel)
+            const delta = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+            velocity -= delta * 0.05;
         }, { passive: false });
 
         // Touch Swipe acceleration (Mobile)

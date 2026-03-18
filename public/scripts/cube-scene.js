@@ -65,8 +65,14 @@
         const elapsed = (ts - startTime) % spinDuration;
         const spinY = -90 + (elapsed / spinDuration) * 360;
 
-        if (!isMobile || !isDragging) {
-            currentTiltX += (0 - currentTiltX) * 0.05; // Dampen to center
+        // Interacción: tilt según cursor en desktop
+        if (!isMobile && !isDragging) {
+            const tiltX = mouseY * tiltRange;
+            const tiltY = mouseX * tiltRange;
+            currentTiltX += (tiltX - currentTiltX) * 0.08;
+            currentTiltY += (tiltY - currentTiltY) * 0.08;
+        } else if (!isMobile || !isDragging) {
+            currentTiltX += (0 - currentTiltX) * 0.05;
             currentTiltY += (0 - currentTiltY) * 0.05;
         }
 

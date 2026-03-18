@@ -191,7 +191,7 @@
             sessionStorage.removeItem(attemptsKey);
             sessionStorage.setItem('tatc-unlocked', 'true');
             if (isAdmin) sessionStorage.setItem('tatc-admin-unlocked', 'true');
-            window.location.href = redirectPage;
+            window.location.replace(redirectPage);
         }
 
         // If no password configured, auto-unlock
@@ -231,6 +231,7 @@
     const tPass = document.getElementById('tPass');
     const eOpen = document.getElementById('eOpen');
     const eClosed = document.getElementById('eClosed');
+    const enterBtn = document.querySelector('.enter-button');
 
     if (tPass && eOpen && eClosed) {
         const setRevealState = (reveal) => {
@@ -252,6 +253,19 @@
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 tPass.click();
+            }
+        });
+    }
+
+    // Asegura que el botón ENTER sea totalmente clicable y accesible
+    if (enterBtn) {
+        enterBtn.addEventListener('click', () => {
+            pForm.requestSubmit();
+        });
+        enterBtn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                pForm.requestSubmit();
             }
         });
     }

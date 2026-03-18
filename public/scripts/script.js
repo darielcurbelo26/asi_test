@@ -507,6 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // container.style.visibility = 'visible'; // Handled by GSAP timeline now
     cubeLoop();
 
+
     // ─────────────────────────────────────────────────────────────────────────────
     // --- 3. VISIBILITY TOGGLE — Blur + Fade (GSAP) ---
     // ─────────────────────────────────────────────────────────────────────────────

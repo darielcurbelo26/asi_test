@@ -135,6 +135,12 @@ body {
     width: 100%;
 }
 
+body.body_fixed {
+     overflow: hidden !important;
+     height: 100vh;
+     touch-action: none;
+}
+
 .transition-overlay {
     position: fixed;
     top: -5dvh;

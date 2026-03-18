@@ -15,10 +15,10 @@
         }
     },
     "pages": {
-        "a-sweet-kid-online.html": {
-            "name": "ASWEETKID",
-            "tagline": "ENTER THE VIRTUAL GALLERY"
-        },
+            "a-sweet-kid-online.html": {
+                "name": "ASWEETKID",
+                "tagline": "ENTER THE VIRTUAL GALLERY"
+            },
         "blog.html": {
             "name": "THE GIST",
             "tagline": "SELECTED JOURNAL"
@@ -280,10 +280,9 @@
             "artist.html": "public",
             "blog.html": "private",
             "post.html": "private",
-            "a-sweet-kid-online.html": "private"
+            "a-sweet-kid-online.html": "public"
         },
         "page_passwords": {
-            "a-sweet-kid-online.html": "sweet"
         }
     }
 }

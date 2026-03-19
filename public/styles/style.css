@@ -1054,11 +1054,13 @@ body:not(.body-404) .difference-text {
 }
 
 .body_fixed {
-    display: flex;
-    flex-direction: column;
+    display: block;
     height: 100dvh;
-    overflow: hidden;
+    min-height: 100dvh;
+    overflow: hidden !important;
     position: relative;
+    width: 100vw;
+    touch-action: none;
 }
 
 
@@ -1553,17 +1555,15 @@ body.dark-mode .not-found-ui-layer {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 73%;
-    height: auto;
-    max-height: 73%;
-    transform: translate(-50%, -50%);
-    filter: none;
-    object-fit: contain;
-    object-position: center;
-    pointer-events: none;
-}
-
-body.dark-mode.a-sweet-kid-page .heading-style-h1-image img {
+    width: 100vw;
+    min-height: 100dvh;
+    height: 100dvh;
+    display: block;
+    overflow: hidden;
+    position: relative;
+    background-color: transparent;
+    padding-top: 4rem;
+    /* Spacer for fixed navbar */
     filter: invert(1);
 }
 

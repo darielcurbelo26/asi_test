@@ -31,7 +31,15 @@
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#050505;font-family:'IBM Plex Mono',monospace;cursor:none}
+html,body{
+  width:100%;
+  min-height:100dvh;
+  height:100dvh;
+  overflow:hidden;
+  background:#050505;
+  font-family:'IBM Plex Mono',monospace;
+  cursor:none;
+}
 :root{
   --hud-surface:rgba(5,5,5,.5);
   --hud-surface-strong:rgba(8,8,8,.8);
@@ -242,6 +250,13 @@ body.focus-mode #fb-next{
 
 /* ── MOBILE ── */
 @media (max-width: 600px) {
+  html,body {
+    min-height:100dvh;
+    height:100dvh;
+    overflow:hidden;
+    position:relative;
+    touch-action:none;
+  }
   #hud-tl { top:1.1rem; left:1.1rem; font-size:9px; letter-spacing:0.28em }
   #hud-tr {
     top:var(--edge-top); right:var(--edge-right);

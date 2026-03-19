@@ -229,6 +229,10 @@ body.theme-switching .nav_component .difference-text div {
         background-color: #fff !important;
         background: #fff !important;
     }
+    body.dark-mode .projects-page .nav_button.active div {
+        background-color: white !important;
+        background: white !important;
+    }
 }
 
 /* Burger y TATC negros en móvil cuando el menú está abierto (Solo Projects Page) */
@@ -245,7 +249,7 @@ body.theme-switching .nav_component .difference-text div {
         background-color: #000000 !important;
     }
     body.dark-mode .projects-page .nav_component:has(.nav_button.active) .nav_button div {
-        background-color: #fff !important;
+        background-color: white !important;
     }
 }
 

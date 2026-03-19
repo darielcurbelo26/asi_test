@@ -1,66 +1,4 @@
-@font-face {
-    font-family: "Inter Variable";
-    src: url("../assets/fonts/inter/Inter-opsz-wght.ttf") format("truetype");
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Inter Variable";
-    src: url("../assets/fonts/inter/Inter-Italic-opsz-wght.ttf") format("truetype");
-    font-weight: 100 900;
-    font-style: italic;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Inter";
-    src: url("../assets/fonts/inter/Inter-opsz-wght.ttf") format("truetype");
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "IBM Plex Mono";
-    src: url("../assets/fonts/ibm-plex-mono/IBMPlexMono-Light.ttf") format("truetype");
-    font-weight: 300;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "IBM Plex Mono";
-    src: url("../assets/fonts/ibm-plex-mono/IBMPlexMono-Regular.ttf") format("truetype");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "IBM Plex Mono";
-    src: url("../assets/fonts/ibm-plex-mono/IBMPlexMono-Medium.ttf") format("truetype");
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "IBM Plex Mono";
-    src: url("../assets/fonts/ibm-plex-mono/IBMPlexMono-SemiBold.ttf") format("truetype");
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "IBM Plex Mono";
-    src: url("../assets/fonts/ibm-plex-mono/IBMPlexMono-Bold.ttf") format("truetype");
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-}
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 /* ═════════════════════════════════════════════════════════════════════════════
    DESIGN SYSTEM - SISTEMA DE DISEÑO COMPLETO
@@ -130,19 +68,9 @@ body.theme-switching * {
 }
 
 html,
-html, body {
+body {
+    overflow-x: hidden;
     width: 100%;
-    min-height: 100dvh;
-    height: 100dvh;
-    overflow: hidden;
-    touch-action: none;
-}
-
-body.body_fixed {
-    overflow: hidden !important;
-    height: 100dvh;
-    min-height: 100dvh;
-    touch-action: none;
 }
 
 .transition-overlay {
@@ -393,20 +321,6 @@ body.theme-switching .nav_component .difference-text div {
     transform: translateX(0);
 }
 
-.nav_menu .nav_list a,
-.nav_menu .nav_list a .text-inner,
-.nav_menu .nav_list a .text-outer {
-    opacity: 1;
-    visibility: visible;
-}
-
-.nav_menu.active .nav_list a,
-.nav_menu.active .nav_list a .text-inner,
-.nav_menu.active .nav_list a .text-outer {
-    opacity: 1 !important;
-    visibility: visible !important;
-}
-
 /* Lock body scroll whenever the menu is open at any breakpoint */
 body.menu-open {
     overflow: hidden !important;
@@ -481,8 +395,6 @@ body.dark-mode .social_link img {
     justify-content: center;
     align-items: center;
     padding: .75rem .75rem 4% .75rem;
-    min-height: 100dvh;
-    height: 100dvh;
 }
 
 .heading-style-h1 {
@@ -570,7 +482,6 @@ body.dark-mode .social_link img {
 .layout_bottom {
     width: 100%;
     min-height: calc(100dvh - 5rem);
-    height: 100dvh;
     /* Adjust for navbar */
     display: flex;
     flex-direction: column;
@@ -603,13 +514,6 @@ body.dark-mode .social_link img {
 
 /* --- 7. RESPONSIVE (MOBILE) --- */
 @media (max-width: 768px) {
-    html, body {
-        min-height: 100dvh;
-        height: 100dvh;
-        overflow: hidden;
-        position: relative;
-        touch-action: none;
-    }
     .nav_menu {
         width: 100vw;
         border-left: none;
@@ -697,7 +601,6 @@ body.dark-mode .social_link img {
     background: var(--cube-bg);
     border: 1px solid var(--cube-border);
     backface-visibility: hidden;
-    user-select: none;
     transition: background-color var(--theme-transition), border-color var(--theme-transition);
 }
 
@@ -1054,13 +957,11 @@ body:not(.body-404) .difference-text {
 }
 
 .body_fixed {
-    display: block;
+    display: flex;
+    flex-direction: column;
     height: 100dvh;
-    min-height: 100dvh;
-    overflow: hidden !important;
+    overflow: hidden;
     position: relative;
-    width: 100vw;
-    touch-action: none;
 }
 
 
@@ -1555,15 +1456,17 @@ body.dark-mode .not-found-ui-layer {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 100vw;
-    min-height: 100dvh;
-    height: 100dvh;
-    display: block;
-    overflow: hidden;
-    position: relative;
-    background-color: transparent;
-    padding-top: 4rem;
-    /* Spacer for fixed navbar */
+    width: 73%;
+    height: auto;
+    max-height: 73%;
+    transform: translate(-50%, -50%);
+    filter: none;
+    object-fit: contain;
+    object-position: center;
+    pointer-events: none;
+}
+
+body.dark-mode.a-sweet-kid-page .heading-style-h1-image img {
     filter: invert(1);
 }
 

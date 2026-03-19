@@ -304,7 +304,6 @@
         });
 
         wrapper.addEventListener('click', function () {
-            if (state.isAnimating) return;
             if (state.wasDragging) { state.wasDragging = false; return; }
             hideHint();
             if (state.cursorZone === 'up') {

@@ -130,14 +130,12 @@ body.theme-switching * {
 }
 
 html,
-body {
-    overflow-x: hidden;
-    width: 100%;
-}
 html, body {
+    width: 100%;
     min-height: 100dvh;
     height: 100dvh;
     overflow: hidden;
+    touch-action: none;
 }
 
 body.body_fixed {
@@ -485,8 +483,6 @@ body.dark-mode .social_link img {
     padding: .75rem .75rem 4% .75rem;
     min-height: 100dvh;
     height: 100dvh;
-    overflow: hidden;
-}
 }
 
 .heading-style-h1 {
@@ -607,6 +603,13 @@ body.dark-mode .social_link img {
 
 /* --- 7. RESPONSIVE (MOBILE) --- */
 @media (max-width: 768px) {
+    html, body {
+        min-height: 100dvh;
+        height: 100dvh;
+        overflow: hidden;
+        position: relative;
+        touch-action: none;
+    }
     .nav_menu {
         width: 100vw;
         border-left: none;

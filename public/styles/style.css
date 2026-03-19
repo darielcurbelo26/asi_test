@@ -123,7 +123,19 @@ a {
     transition: none; /* Disable color transition within difference mode */
 }
 
-.nav_component.is-solid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100dvh;
+        height: 100dvh;
+        width: 100vw;
+        text-align: center;
+        /* Sync with .section_hero padding from style.css */
+        padding: .75rem .75rem 4% .75rem;
+        box-sizing: border-box;
+        position: relative;
+        /* Additional styles can be added here */
     background-color: transparent;
     mix-blend-mode: difference;
     border-bottom: none;
@@ -213,6 +225,10 @@ body.theme-switching .nav_component .difference-text div {
         background-color: #000000 !important;
         background: #000000 !important;
     }
+    body.dark-mode .projects-page .nav_button.active div {
+        background-color: #fff !important;
+        background: #fff !important;
+    }
 }
 
 /* Burger y TATC negros en móvil cuando el menú está abierto (Solo Projects Page) */
@@ -227,6 +243,9 @@ body.theme-switching .nav_component .difference-text div {
 
     .projects-page .nav_component:has(.nav_button.active) .nav_button div {
         background-color: #000000 !important;
+    }
+    body.dark-mode .projects-page .nav_component:has(.nav_button.active) .nav_button div {
+        background-color: #fff !important;
     }
 }
 

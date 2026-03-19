@@ -136,9 +136,10 @@ body {
 }
 
 body.body_fixed {
-     overflow: hidden !important;
-     height: 100vh;
-     touch-action: none;
+    overflow: hidden !important;
+    height: 100dvh;
+    min-height: 100dvh;
+    touch-action: none;
 }
 
 .transition-overlay {
@@ -477,6 +478,8 @@ body.dark-mode .social_link img {
     justify-content: center;
     align-items: center;
     padding: .75rem .75rem 4% .75rem;
+    min-height: 100dvh;
+    height: 100dvh;
 }
 
 .heading-style-h1 {
@@ -564,6 +567,7 @@ body.dark-mode .social_link img {
 .layout_bottom {
     width: 100%;
     min-height: calc(100dvh - 5rem);
+    height: 100dvh;
     /* Adjust for navbar */
     display: flex;
     flex-direction: column;

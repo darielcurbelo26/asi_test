@@ -134,6 +134,11 @@ body {
     overflow-x: hidden;
     width: 100%;
 }
+html, body {
+    min-height: 100dvh;
+    height: 100dvh;
+    overflow: hidden;
+}
 
 body.body_fixed {
     overflow: hidden !important;
@@ -480,6 +485,8 @@ body.dark-mode .social_link img {
     padding: .75rem .75rem 4% .75rem;
     min-height: 100dvh;
     height: 100dvh;
+    overflow: hidden;
+}
 }
 
 .heading-style-h1 {

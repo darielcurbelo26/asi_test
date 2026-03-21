@@ -189,9 +189,15 @@
         function grantAccess() {
             localStorage.removeItem(lockoutKey);
             sessionStorage.removeItem(attemptsKey);
-            sessionStorage.setItem('tatc-unlocked', 'true');
+
+            // Extract page name for specific unlock (clean from query and hash)
+            const target = redirectPage === 'password.html' ? 'index.html' : redirectPage;
+            const pageName = target.split('/').pop().split('?')[0].split('#')[0] || 'index.html';
+            
+            sessionStorage.setItem(`tatc-unlocked-${pageName}`, 'true');
+
             if (isAdmin) sessionStorage.setItem('tatc-admin-unlocked', 'true');
-            window.location.replace(redirectPage);
+            window.location.replace(target);
         }
 
         // If no password configured, auto-unlock

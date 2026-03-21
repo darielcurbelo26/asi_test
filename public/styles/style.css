@@ -118,29 +118,10 @@ a {
 }
 
 .nav_component a, 
-.nav_component .text-style-nav, 
-.nav_component .nav_button {
+nav_component .text-style-nav, 
+nav_component .nav_button {
     transition: none; /* Disable color transition within difference mode */
 }
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100dvh;
-        height: 100dvh;
-        width: 100vw;
-        text-align: center;
-        /* Sync with .section_hero padding from style.css */
-        padding: .75rem .75rem 4% .75rem;
-        box-sizing: border-box;
-        position: relative;
-        /* Additional styles can be added here */
-    background-color: transparent;
-    mix-blend-mode: difference;
-    border-bottom: none;
-    overflow: hidden;
-    transition: mix-blend-mode 0.3s ease;
 }
 
 .nav_component.is-solid::before {
@@ -225,15 +206,16 @@ body.theme-switching .nav_component .difference-text div {
         background-color: #000000 !important;
         background: #000000 !important;
     }
-    body.dark-mode .projects-page .nav_button.active div {
+    body.dark-mode.projects-page .nav_button.active div {
         background-color: #fff !important;
         background: #fff !important;
     }
 }
 
-/* Burger y TATC negros en móvil cuando el menú está abierto (Solo Projects Page) */
+/* Burger y TATC en móvil cuando el menú está abierto (Solo Projects Page) */
 @media screen and (max-width: 768px) {
 
+    /* Light mode: negro para contrastar con el fondo blanco del menú abierto */
     .projects-page .nav_component:has(.nav_button.active) .text-style-nav,
     .projects-page .nav_component:has(.nav_button.active) .text-style-nav * {
         color: #000000 !important;
@@ -243,6 +225,18 @@ body.theme-switching .nav_component .difference-text div {
 
     .projects-page .nav_component:has(.nav_button.active) .nav_button div {
         background-color: #000000 !important;
+    }
+
+    /* Dark mode (tema negro): siempre blanco sin excepción */
+    body.dark-mode.projects-page .nav_component:has(.nav_button.active) .text-style-nav,
+    body.dark-mode.projects-page .nav_component:has(.nav_button.active) .text-style-nav * {
+        color: #ffffff !important;
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+
+    body.dark-mode.projects-page .nav_component:has(.nav_button.active) .nav_button div {
+        background-color: #ffffff !important;
     }
 }
 

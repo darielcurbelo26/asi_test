@@ -92,15 +92,15 @@
             const security = data.security;
             if (!security) return;
 
-            // Get current page filename
+            // Get current page filename without query or hash
             const path = window.location.pathname;
-            const page = path.split("/").pop() || 'index.html';
+            const page = path.split("/").pop().split('?')[0].split('#')[0] || 'index.html';
 
             // Special case for password page itself - avoid infinite loop
             if (page === 'password.html' || page === '404.html') return;
 
             const visibility = security.pages?.[page] || 'public';
-            const isUnlocked = sessionStorage.getItem('tatc-unlocked') === 'true';
+            const isUnlocked = sessionStorage.getItem(`tatc-unlocked-${page}`) === 'true';
 
             if (visibility === 'private' && !isUnlocked) {
                 window.location.href = `password.html?redirect=${page}`;

@@ -280,7 +280,7 @@
             "artist.html": "public",
             "blog.html": "private",
             "post.html": "private",
-            "a-sweet-kid-online.html": "public"
+            "a-sweet-kid-online.html": "private"
         },
         "page_passwords": {
         }

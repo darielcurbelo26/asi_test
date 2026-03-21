@@ -16,7 +16,7 @@
     <script>
     (function () {
         var page = 'post.html';
-        if (sessionStorage.getItem('tatc-unlocked') === 'true') {
+        if (sessionStorage.getItem('tatc-unlocked-' + page) === 'true') {
             document.addEventListener('DOMContentLoaded', function () { document.body.style.display = ''; });
             return;
         }

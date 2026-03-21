@@ -1,6 +1,7 @@
 // --- AUTH CHECK ---
-if (sessionStorage.getItem('tatc-unlocked') !== 'true') {
-  window.location.href = 'password.html?redirect=a-sweet-kid-online.html';
+const pageName = window.location.pathname.split('/').pop().split('?')[0].split('#')[0] || 'index.html';
+if (sessionStorage.getItem('tatc-unlocked-' + pageName) !== 'true') {
+  window.location.href = 'password.html?redirect=' + pageName;
   throw new Error('Not authenticated');
 }
 import * as THREE from 'https://esm.sh/three@0.163.0';

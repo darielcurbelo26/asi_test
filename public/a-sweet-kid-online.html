@@ -9,7 +9,8 @@
 <link rel="stylesheet" href="styles/a-sweet-kid-online.css">
 <script>
 (function () {
-    if (sessionStorage.getItem('tatc-unlocked') === 'true') {
+    var page = 'a-sweet-kid-online.html';
+    if (sessionStorage.getItem('tatc-unlocked-' + page) === 'true') {
         document.addEventListener('DOMContentLoaded', function () { document.body.style.display = ''; });
         return;
     }
@@ -17,14 +18,14 @@
         .then(function (r) { return r.json(); })
         .then(function (data) {
             var pages = data && data.security && data.security.pages;
-            if (pages && pages['a-sweet-kid-online.html'] === 'private') {
-                window.location.replace('password.html?redirect=a-sweet-kid-online.html');
+            if (pages && pages[page] === 'private') {
+                window.location.replace('password.html?redirect=' + page);
             } else {
                 document.body.style.display = '';
             }
         })
         .catch(function () {
-            window.location.replace('password.html?redirect=a-sweet-kid-online.html');
+            window.location.replace('password.html?redirect=' + page);
         });
 }());
 </script>
@@ -79,7 +80,7 @@
 
     <audio id="audio" loop src="projects/a-sweet-kid-online/audio/ambient.mp3"></audio>
 
-<script>if (sessionStorage.getItem('tatc-unlocked') === 'true') document.body.style.display = '';</script>
+<script>if (sessionStorage.getItem('tatc-unlocked-a-sweet-kid-online.html') === 'true') document.body.style.display = '';</script>
 <script type="module" src="scripts/a-sweet-kid-online.js"></script>
 </body>
 </html>

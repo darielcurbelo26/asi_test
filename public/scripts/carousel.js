@@ -401,7 +401,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         let resizeTimer = null;
+        let lastWidth = window.innerWidth;
         window.addEventListener('resize', () => {
+            if (window.innerWidth === lastWidth) return;
+            lastWidth = window.innerWidth;
             if (resizeTimer) clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
                 buildTrack();

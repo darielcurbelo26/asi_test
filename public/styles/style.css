@@ -40,7 +40,7 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     transition: background-color var(--theme-transition), color var(--theme-transition);
-    font-family: "Inter Variable";
+    font-family: "Inter", sans-serif;
 }
 
 /* Disolución de tema sincronizada (solo durante el switch) */
@@ -118,10 +118,9 @@ a {
 }
 
 .nav_component a, 
-nav_component .text-style-nav, 
-nav_component .nav_button {
+.nav_component .text-style-nav, 
+.nav_component .nav_button {
     transition: none; /* Disable color transition within difference mode */
-}
 }
 
 .nav_component.is-solid::before {
@@ -451,7 +450,7 @@ body.dark-mode .social_link img {
 
 /* --- 6.1 UNIFIED TEXT STYLES & LAYOUTS --- */
 .text-style-label {
-    font-family: "Inter Variable", sans-serif;
+    font-family: "Inter", sans-serif;
     text-align: left;
     width: 100%;
     font-size: 0.95rem;
@@ -1064,7 +1063,7 @@ body:not(.body-404) .difference-text {
     z-index: 2;
     padding: 1.5rem 1.5rem 2rem 1.5rem;
     color: #fff;
-    font-family: "Inter Variable";
+    font-family: "Inter", sans-serif;
     font-size: .75rem;
     text-transform: uppercase;
     line-height: 1.2;
@@ -1430,7 +1429,7 @@ body.dark-mode .not-found-ui-layer {
 
 /* About page values should remain static and never flicker */
 .about-page .about-value-title {
-    font-family: "Inter Variable", sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 700;
     color: var(--text-color);
     transition: none;
@@ -1534,7 +1533,7 @@ body.dark-mode.a-sweet-kid-page .heading-style-h1-image img {
     left: 50%;
     transform: translate(-50%, -50%) scale(1.5, 2);
     font-size: 40cqw;
-    font-family: "Inter Variable", sans-serif;
+    font-family: "Inter", sans-serif;
     font-weight: 600;
     line-height: 0.8;
     opacity: 1;
@@ -1586,7 +1585,7 @@ a.not-found-sub:hover {
 }
 
 .not-found-title {
-    font-family: "Inter Variable", sans-serif;
+    font-family: "Inter", sans-serif;
     font-size: 15cqw;
     font-weight: 900;
     letter-spacing: -0.05em;
@@ -1764,7 +1763,7 @@ a.not-found-sub:hover {
 }
 
 .section_hero-title-password {
-    font-family: "Inter Variable", sans-serif;
+    font-family: "Inter", sans-serif;
     font-size: clamp(3rem, 15vw, 15rem);
     font-weight: 950;
     letter-spacing: -0.07em;

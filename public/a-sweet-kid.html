@@ -121,9 +121,10 @@
             font-size: clamp(11px, 1.35vw, 14px);
         }
 
-        .a-sweet-kid-page .nav_menu.active .nav_list a,
-        .a-sweet-kid-page .nav_menu.active .nav_list a .text-inner,
-        .a-sweet-kid-page .nav_menu.active .nav_list a .text-outer {
+        .a-sweet-kid-page .nav_menu .nav_list a,
+        .a-sweet-kid-page .nav_menu .nav_list a .text-inner,
+        .a-sweet-kid-page .nav_menu .nav_list a .text-outer {
+            color: var(--text-color) !important;
             opacity: 1 !important;
             visibility: visible !important;
         }
@@ -171,11 +172,57 @@
 <body class="a-sweet-kid-page project-page-a-sweet-kid">
     <div class="transition-overlay" style="background:black;"></div>
 
+    <nav class="nav_component">
+        <div class="nav_container">
+            <a href="index.html" class="text-style-nav difference-text">
+                <span class="hover-split-text">
+                    <span class="text-inner" data-cms="global.brand">TATC</span>
+                    <span class="text-outer" data-cms="global.brand">TATC</span>
+                </span>
+            </a>
+            <div class="nav_button difference-text" id="nav_button-menu">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </nav>
+
     <div class="page-wrapper">
         <div class="fixed-controls_component">
             <div class="icon-button is-cube" title="Toggle Visibility"></div>
             <div class="icon-button is-square" title="Toggle Theme"></div>
         </div>
+
+        <nav class="nav_menu">
+            <div class="nav_container nav_menu-container">
+                <div class="nav_list">
+                    <a href="blog.html" class="text-style-nav nav_link">
+                        <span class="hover-split-text">
+                            <span class="text-inner" data-cms="global.nav.blog">The Gist</span>
+                            <span class="text-outer" data-cms="global.nav.blog">The Gist</span>
+                        </span>
+                    </a>
+                    <a href="projects.html" class="text-style-nav nav_link">
+                        <span class="hover-split-text">
+                            <span class="text-inner" data-cms="global.nav.projects">Projects</span>
+                            <span class="text-outer" data-cms="global.nav.projects">Projects</span>
+                        </span>
+                    </a>
+                    <a href="about.html" class="text-style-nav nav_link">
+                        <span class="hover-split-text">
+                            <span class="text-inner" data-cms="global.nav.info">Info</span>
+                            <span class="text-outer" data-cms="global.nav.info">Info</span>
+                        </span>
+                    </a>
+                </div>
+                <div class="nav_list social_list">
+                    <a data-cms="global.social.twitter" data-cms-attr="href" target="_blank" class="social_link"><img src="assets/social_icons/xx.svg" alt="xx"></a>
+                    <a data-cms="global.social.email" data-cms-attr="href" class="social_link"><img src="assets/social_icons/mail.svg" alt="mail"></a>
+                    <a data-cms="global.social.instagram" data-cms-attr="href" target="_blank" class="social_link"><img src="assets/social_icons/instagram.svg" alt="instagram"></a>
+                </div>
+            </div>
+        </nav>
 
         <section class="section_hero layout_stack">
             <h1 class="heading-style-h1 heading-style-h1-image" id="proj-h1" aria-label="A Sweet Kid">
@@ -230,7 +277,6 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="scripts/nav.js?v=20260317k"></script>
     <script src="scripts/script.js?v=20260317i"></script>
     <script src="scripts/carousel.js?v=20260317g"></script>
 
